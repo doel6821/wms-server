@@ -1,0 +1,223 @@
+definitions:
+  models.MetaData:
+    properties:
+      code:
+        type: string
+      message:
+        type: string
+      title:
+        type: string
+    type: object
+  models.Page:
+    properties:
+      curPage:
+        type: integer
+      nextPage:
+        type: integer
+      prevPage:
+        type: integer
+    type: object
+  models.QueryParams:
+    properties:
+      limit:
+        type: integer
+      name:
+        type: string
+      page:
+        type: integer
+    type: object
+  models.Response:
+    properties:
+      count:
+        type: integer
+      data: {}
+      meta:
+        $ref: '#/definitions/models.MetaData'
+      page:
+        $ref: '#/definitions/models.Page'
+    type: object
+info:
+  contact: {}
+paths:
+  /healthcheck:
+    get:
+      description: hc endpoint
+      operationId: hc
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: HealtCheck
+      tags:
+      - HC
+  /v1/push-kafka:
+    post:
+      description: example endpoint push data to kafka
+      operationId: push-data-kafka
+      parameters:
+      - description: Client ID header
+        in: header
+        name: CLIENT-ID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: PushDataKafka
+      tags:
+      - example
+  /v1/root:
+    post:
+      description: example endpoint
+      operationId: root
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Root
+      tags:
+      - example
+  /v1/sample/body:
+    post:
+      consumes:
+      - application/json
+      description: example bind body json
+      operationId: bind-body
+      parameters:
+      - description: request
+        in: body
+        name: request
+        schema:
+          $ref: '#/definitions/models.QueryParams'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: BindBody
+      tags:
+      - example
+  /v1/sample/header:
+    post:
+      consumes:
+      - application/json
+      description: example bind header
+      operationId: bind-header
+      parameters:
+      - description: name
+        in: header
+        name: name
+        type: string
+      - description: page
+        in: header
+        name: page
+        type: integer
+      - description: limit
+        in: header
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: BindHeader
+      tags:
+      - example
+  /v1/sample/query:
+    get:
+      consumes:
+      - application/json
+      description: example bind query params
+      operationId: bind-query-params
+      parameters:
+      - description: name
+        in: query
+        name: name
+        type: string
+      - description: page
+        in: query
+        name: page
+        type: integer
+      - description: limit
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: BindQueryParam
+      tags:
+      - example
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

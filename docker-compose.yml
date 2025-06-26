@@ -1,0 +1,22 @@
+version: '3.2'
+services:
+  wms-server:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+      args:
+        ANDROMEDA_USERNAME: 
+        ANDROMEDA_TOKEN:
+        SERVICE_NAME:
+    image: docker-regis.ottodigital.id/dev/-/wms-server:latest
+    container_name: CODE_wms-server
+    ports:
+      - "7878:7878"
+    env_file:
+      - ./.env
+    network_mode: bridge
+    restart: unless-stopped
+    volumes:
+      - ./errorcodes.json:/app/errorcodes.json
+      - ./errorcodes/:/app/errorcodes/
+      - ./logs/:/app/logs/

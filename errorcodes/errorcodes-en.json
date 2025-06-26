@@ -1,0 +1,90 @@
+[
+  {
+    "key": "success",
+    "content": {
+      "code": "200?00",
+      "title": "Success",
+      "message": "Successful"
+    }
+  },
+  {
+    "key": "inProgress",
+    "content": {
+      "code": "202?00",
+      "title": "In Progress",
+      "message": "Request In Progress"
+    }
+  },
+  {
+    "key": "badRequest",
+    "content": {
+      "code": "400?00",
+      "title": "Failed",
+      "message": "Bad Request"
+    }
+  },
+  {
+    "key": "invalidFormat",
+    "content": {
+      "code": "400?01",
+      "title": "Failed",
+      "message": "Invalid Field Format {field name}"
+    }
+  },
+  {
+    "key": "mandatory",
+    "content": {
+      "code": "400?02",
+      "title": "Failed",
+      "message": "Invalid Mandatory Field {field name}"
+    }
+  },
+  {
+    "key": "unauthorized",
+    "content": {
+      "code": "401?00",
+      "title": "Failed",
+      "message": "Unauthorized. [reason]"
+    }
+  },
+  {
+    "key": "invalidToken",
+    "content": {
+      "code": "401?01",
+      "title": "Failed",
+      "message": "Invalid Token"
+    }
+  },
+  {
+    "key": "emailAlreadyUsed",
+    "content": {
+      "code": "400?03",
+      "title": "Failed",
+      "message": "Email Already Used"
+    }
+  },
+  {
+    "key": "storeNameAlreadyUsed",
+    "content": {
+      "code": "400?04",
+      "title": "Failed",
+      "message": "Store Name Already Used"
+    }
+  },
+  {
+    "key": "invalidEmailOrPassword",
+    "content": {
+      "code": "400?05",
+      "title": "Error",
+      "message": "Invalid User Name Or Password"
+    }
+  },
+  {
+    "key": "general",
+    "content": {
+      "code": "500?00",
+      "title": "Error",
+      "message": "General Error"
+    }
+  }
+]
