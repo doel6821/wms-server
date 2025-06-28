@@ -26,6 +26,14 @@ type (
 		FindUser(ctx context.Context, email string) (models.User, error)
 		FindTenant(ctx context.Context, tenant string) (models.User, error)
 		Save(ctx context.Context, user models.User)  error
+
+		SaveCustomers(ctx context.Context, data models.Customers) (error)
+		GetCustomerList(ctx context.Context, name string, page , limit int) ( []models.Customers, int64, error)
+		GetCustomerById(ctx context.Context, id int64) (data models.Customers, err error)
+		GetCustomerByPhone(ctx context.Context, phone string) (data models.Customers, err error)
+		DeleteCustomerById(ctx context.Context, id int64) (err error)
+
+
 	}
 )
 

@@ -111,6 +111,40 @@ func (r *Router) routerControllers() {
 		v1.POST("/register-user", r.Controller.V1().RegisterUser)
 		v1.POST("/register-tenant", r.Controller.V1().RegisterTenant)
 
+		// customer := v1.Group("/customer")
+		// customer.GET("/all", r.Controller.V1().BindQueryParam)
+		// customer.GET("/:id", r.Controller.V1().GetData)
+		// customer.POST("/", r.Controller.V1().BindBody)
+		// customer.DELETE("/:id", r.Controller.V1().BindHeader)
+
+		// product := v1.Group("/product")
+		// product.GET("/all", r.Controller.V1().)
+		// product.GET("/:id", r.Controller.V1().)
+		// product.POST("/", r.Controller.V1().)
+		// product.DELETE("/:id", r.Controller.V1().)
+
+		// sales := v1.Group("/sales")
+		// sales.GET("/all", r.Controller.V1().)
+		// sales.GET("/:id", r.Controller.V1().)
+		// sales.POST("/", r.Controller.V1().)
+		// sales.DELETE("/:id", r.Controller.V1().)
+
+		// purchase := v1.Group("/purchase")
+		// purchase.GET("/all", r.Controller.V1().)
+		// purchase.GET("/:id", r.Controller.V1().)
+		// purchase.POST("/", r.Controller.V1().)
+		// purchase.DELETE("/:id", r.Controller.V1().)
+
+		// receive := v1.Group("/receive")
+		// receive.GET("/all", r.Controller.V1().)
+		// receive.GET("/:id", r.Controller.V1().)
+		// receive.POST("/", r.Controller.V1().)
+		// receive.DELETE("/:id", r.Controller.V1().)
+
+		// report := v1.Group("/report")
+		// report.GET("/sales", r.Controller.V1().)
+		// report.GET("/purchase", r.Controller.V1().)
+
 
 	}
 

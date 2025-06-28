@@ -72,6 +72,14 @@
     }
   },
   {
+    "key": "phoneNumberAlreadyUsed",
+    "content": {
+      "code": "400?05",
+      "title": "Failed",
+      "message": "Phone Number Already Used"
+    }
+  },
+  {
     "key": "invalidEmailOrPassword",
     "content": {
       "code": "400?05",
