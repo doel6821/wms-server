@@ -22,6 +22,11 @@ type (
 		CekToken(ctx *gin.Context)
 		RegisterUser(ctx *gin.Context)
 		RegisterTenant(ctx *gin.Context)
+
+		SaveCustomer(ctx *gin.Context)
+		ListCustomer(ctx *gin.Context)
+		GetCustomerById(ctx *gin.Context)
+		DeleteCustomerById(ctx *gin.Context)
 		// END __INCLUDE_TEMPLATE__
 	}
 )

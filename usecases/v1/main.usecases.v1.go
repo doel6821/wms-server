@@ -22,6 +22,12 @@ type (
 		Login(ctx context.Context, req cModels.LoginRequest) hModels.Response
 		RegisterUser(ctx context.Context, req cModels.RegisterRequest) hModels.Response
 		RegisterTenant(ctx context.Context, req cModels.RegisterRequest) hModels.Response
+
+		SaveCustomer(ctx context.Context, req cModels.RegisterCustomerRequest) hModels.Response
+		GetCustomerList(ctx context.Context, name string, page , limit int) hModels.Response
+		GetCustomerId(ctx context.Context, id int64) hModels.Response
+		DeleteCustomerId(ctx context.Context, id int64) hModels.Response
+
 		// END __INCLUDE_TEMPLATE__
 	}
 )

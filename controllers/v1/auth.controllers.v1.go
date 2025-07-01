@@ -29,7 +29,7 @@ var (
 // @Failure 400 {object} models.Response
 // @Router /wms-server/v.1/login [post]
 func (c *v1Controller) Login(ctx *gin.Context) {
-
+	trxTime := time.Now()
 	var res hModels.Response
 	var req cModels.LoginRequest
 
@@ -41,7 +41,7 @@ func (c *v1Controller) Login(ctx *gin.Context) {
 	}
 
 	res = c.Usecase.Login(ctx, req)
-
+	c.Logs.WithFields(helpers.GettingResponseLog( ctx, req, res, time.Since(trxTime))).Info("Login")
 	ctx.JSON(http.StatusOK, res)
 }
 
@@ -56,7 +56,7 @@ func (c *v1Controller) Login(ctx *gin.Context) {
 // @Failure 400 {object} models.Response
 // @Router /wms-server/v.1.0.0/register-user [post]
 func (c *v1Controller) RegisterUser(ctx *gin.Context) {
-
+	trxTime := time.Now()
 	var res hModels.Response
 	var req cModels.RegisterRequest
 
@@ -68,7 +68,7 @@ func (c *v1Controller) RegisterUser(ctx *gin.Context) {
 	}
 
 	res = c.Usecase.RegisterUser(ctx, req)
-
+	c.Logs.WithFields(helpers.GettingResponseLog( ctx, req, res, time.Since(trxTime))).Info("Register User")
 	ctx.JSON(http.StatusOK, res)
 }
 
@@ -82,7 +82,7 @@ func (c *v1Controller) RegisterUser(ctx *gin.Context) {
 // @Failure 400 {object} models.Response
 // @Router /wms-server/v.1.0.0/register-tenant [post]
 func (c *v1Controller) RegisterTenant(ctx *gin.Context) {
-
+	trxTime := time.Now()
 	var res hModels.Response
 	var req cModels.RegisterRequest
 
@@ -94,7 +94,7 @@ func (c *v1Controller) RegisterTenant(ctx *gin.Context) {
 	}
 
 	res = c.Usecase.RegisterTenant(ctx, req)
-
+	c.Logs.WithFields(helpers.GettingResponseLog( ctx, req, res, time.Since(trxTime))).Info("Register Tenant")
 	ctx.JSON(http.StatusOK, res)
 }
 

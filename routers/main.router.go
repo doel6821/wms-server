@@ -111,11 +111,11 @@ func (r *Router) routerControllers() {
 		v1.POST("/register-user", r.Controller.V1().RegisterUser)
 		v1.POST("/register-tenant", r.Controller.V1().RegisterTenant)
 
-		// customer := v1.Group("/customer")
-		// customer.GET("/all", r.Controller.V1().BindQueryParam)
-		// customer.GET("/:id", r.Controller.V1().GetData)
-		// customer.POST("/", r.Controller.V1().BindBody)
-		// customer.DELETE("/:id", r.Controller.V1().BindHeader)
+		customer := v1.Group("/customer")
+		customer.GET("/all", r.Controller.V1().ListCustomer)
+		customer.GET("/:id", r.Controller.V1().GetCustomerById)
+		customer.POST("/", r.Controller.V1().SaveCustomer)
+		customer.DELETE("/:id", r.Controller.V1().DeleteCustomerById)
 
 		// product := v1.Group("/product")
 		// product.GET("/all", r.Controller.V1().)

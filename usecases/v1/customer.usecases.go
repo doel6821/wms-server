@@ -35,7 +35,7 @@ func (u *usecase) SaveCustomer(ctx context.Context, req cModels.RegisterCustomer
 				res.Meta = helpers.GetNewMetaResponse("en", constants.RC_GENERAL_ERROR)
 				return res
 			}
-		} else {
+		} else if customer.ID != 0 {
 			u.Logs.WithContext(ctx).WithError(err).Error("phone number already used")
 			res.Meta = helpers.GetNewMetaResponse("en", constants.RC_PHONE_NUMBER_ALREADY_USED)
 			return res
