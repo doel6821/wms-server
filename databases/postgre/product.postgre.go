@@ -56,10 +56,10 @@ func (d *postgreDatabase) GetProductById(ctx context.Context, id int64) (data mo
 }
 
 // GetProductByCode ...
-func (d *postgreDatabase) GetProductByCode(ctx context.Context, code string) (data models.Product, err error) {
+func (d *postgreDatabase) GetProductByCode(ctx context.Context, tenant, code string) (data models.Product, err error) {
 	query := d.Db.WithContext(ctx)
 	
-	if err = query.Where("code = ?", code).First(&data).Error; err != nil {
+	if err = query.Where("code = ? and tenant = ?", code, tenant).First(&data).Error; err != nil {
 		d.Logs.WithContext(ctx).WithError(err).Error("Error getting existing data")
 		return data, err
 	}

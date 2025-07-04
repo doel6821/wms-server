@@ -82,9 +82,17 @@
   {
     "key": "invalidEmailOrPassword",
     "content": {
-      "code": "400?05",
+      "code": "400?06",
       "title": "Error",
       "message": "Invalid User Name Or Password"
+    }
+  },
+  {
+    "key": "locationExist",
+    "content": {
+      "code": "400?07",
+      "title": "Error",
+      "message": "Location already exist"
     }
   },
   {

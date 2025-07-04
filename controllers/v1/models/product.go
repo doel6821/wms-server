@@ -13,6 +13,5 @@ type RegisterProductRequest struct {
 	StockOnPurchase int     `json:"stockOnPurchase"`
 	StockOnReceive  int     `json:"stockOnReceive"`
 	LeadTimeDays    int     `json:"leadTimeDays"`
-	Tenant          string `json:"tenant"`
 }
 

@@ -32,7 +32,12 @@ type (
 		ListProduct(ctx *gin.Context)
 		GetProductById(ctx *gin.Context)
 		DeleteProductById(ctx *gin.Context)
-		// END __INCLUDE_TEMPLATE__
+
+		SaveLocation(ctx *gin.Context)
+		ListLocation(ctx *gin.Context)
+		GetLocationByCode(ctx *gin.Context)
+		DeleteLocationById(ctx *gin.Context)
+		
 	}
 )
 

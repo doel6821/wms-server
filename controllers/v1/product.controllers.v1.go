@@ -32,8 +32,8 @@ func (c *v1Controller) SaveProduct(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, res)
 		return
 	}
-
-	res = c.Usecase.SaveProduct(ctx, req)
+	tenant := ctx.GetString("tenant")
+	res = c.Usecase.SaveProduct(ctx,tenant, req)
 	c.Logs.WithFields(helpers.GettingResponseLog( ctx, req, res, time.Since(trxTime))).Info("Save Product List")
 	ctx.JSON(http.StatusOK, res)
 }
@@ -85,7 +85,7 @@ func (c *v1Controller) ListProduct(ctx *gin.Context) {
 	name = ctx.Query("name")
 	code = ctx.Query("code")
 	tenant := ctx.GetString("tenant")
-	
+
 	res = c.Usecase.GetProductList(ctx, tenant, name, code, page, limit)
 	c.Logs.WithFields(helpers.GettingResponseLog( ctx, name, res, time.Since(trxTime))).Info("Get Product List")
 	ctx.JSON(http.StatusOK, res)

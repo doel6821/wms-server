@@ -28,11 +28,16 @@ type (
 		GetCustomerId(ctx context.Context, id int64) hModels.Response
 		DeleteCustomerId(ctx context.Context, id int64) hModels.Response
 
-		SaveProduct(ctx context.Context, req cModels.RegisterProductRequest) hModels.Response
+		SaveProduct(ctx context.Context, tenant string , req cModels.RegisterProductRequest) hModels.Response
 		GetProductList(ctx context.Context,tenant, name, code string, page, limit int) hModels.Response
 		GetProductId(ctx context.Context, id int64) hModels.Response
 		DeleteProductId(ctx context.Context, id int64) hModels.Response 
-		// END __INCLUDE_TEMPLATE__
+
+		SaveLocation(ctx context.Context, tenant string, req cModels.RegisterLocationRequest) hModels.Response
+		GetLocationList(ctx context.Context, tenant string) hModels.Response
+		GetLocationByCode(ctx context.Context, tenant, code string) hModels.Response
+		DeleteLocationId(ctx context.Context, id int64) hModels.Response
+		
 	}
 )
 

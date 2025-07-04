@@ -123,23 +123,36 @@ func (r *Router) routerControllers() {
 		product.POST("/", r.Controller.V1().SaveProduct)
 		product.DELETE("/:id", r.Controller.V1().DeleteProductById)
 
+		location := v1.Group("/location")
+		location.GET("/all", r.Controller.V1().ListLocation)
+		location.GET("/:code", r.Controller.V1().GetLocationByCode)
+		location.POST("/", r.Controller.V1().SaveLocation)
+		location.DELETE("/:id", r.Controller.V1().DeleteLocationById)
+
 		// sales := v1.Group("/sales")
 		// sales.GET("/all", r.Controller.V1().)
 		// sales.GET("/:id", r.Controller.V1().)
 		// sales.POST("/", r.Controller.V1().)
-		// sales.DELETE("/:id", r.Controller.V1().)
+
+		// packing := v1.Group("/packing")
+		// packing.GET("/all", r.Controller.V1().)
+		// packing.GET("/:id", r.Controller.V1().)
+		// packing.POST("/", r.Controller.V1().)
+
+		// invoice := v1.Group("/invoice")
+		// invoice.GET("/all", r.Controller.V1().)
+		// invoice.GET("/:id", r.Controller.V1().)
+		// invoice.POST("/", r.Controller.V1().)
 
 		// purchase := v1.Group("/purchase")
 		// purchase.GET("/all", r.Controller.V1().)
 		// purchase.GET("/:id", r.Controller.V1().)
 		// purchase.POST("/", r.Controller.V1().)
-		// purchase.DELETE("/:id", r.Controller.V1().)
 
 		// receive := v1.Group("/receive")
 		// receive.GET("/all", r.Controller.V1().)
 		// receive.GET("/:id", r.Controller.V1().)
 		// receive.POST("/", r.Controller.V1().)
-		// receive.DELETE("/:id", r.Controller.V1().)
 
 		// report := v1.Group("/report")
 		// report.GET("/sales", r.Controller.V1().)

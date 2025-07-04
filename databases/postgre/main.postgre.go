@@ -36,11 +36,16 @@ type (
 		SaveProduct(ctx context.Context, data models.Product) (error)
 		GetProductList(ctx context.Context, tenant, name, code string, page , limit int) ( []models.Product, int64, error)
 		GetProductById(ctx context.Context, id int64) (data models.Product, err error)
-		GetProductByCode(ctx context.Context, code string) (data models.Product, err error)
+		GetProductByCode(ctx context.Context, tenant, code string) (data models.Product, err error)
 		DeleteProductById(ctx context.Context, id int64)  error
 
 		SaveDemand(ctx context.Context, data models.Demand) (error)
 		GetDemandByProductId(ctx context.Context, productId int64) (data models.Demand, err error)
+
+		SaveLocation(ctx context.Context, data models.Location) (error)
+		GetLocationList(ctx context.Context, tenant string) ( []models.Location, error)
+		GetLocationByLocationCode(ctx context.Context,tenant, locationCode string) (data models.Location, err error)
+		DeleteLocationById(ctx context.Context, id int64)  error
 	}
 )
 

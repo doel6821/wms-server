@@ -15,6 +15,7 @@ const (
 	RC_EMAIL_ALREADY_USED        = "emailAlreadyUsed"
 	RC_STORE_NAME_ALREADY_USED   = "storeNameAlreadyUsed"
 	RC_PHONE_NUMBER_ALREADY_USED = "phoneNumberAlreadyUsed"
+	RC_LOCATION_EXIST            = "locationExist"
 	RC_TIMEOUT                   = "timeoutRequest"
 )
 const (

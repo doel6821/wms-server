@@ -9,7 +9,7 @@ import (
 	hModels "wms-server/helpers/models"
 )
 
-func (u *usecase) SaveProduct(ctx context.Context, req cModels.RegisterProductRequest) hModels.Response {
+func (u *usecase) SaveProduct(ctx context.Context, tenant string, req cModels.RegisterProductRequest) hModels.Response {
 	res := hModels.Response{
 		Meta: helpers.GetNewMetaResponse("en", constants.RC_GENERAL_ERROR),
 	}
@@ -17,7 +17,7 @@ func (u *usecase) SaveProduct(ctx context.Context, req cModels.RegisterProductRe
 	var product pModels.Product
 	var err error
 	if req.ID == 0 {
-		product, err = u.DB.GetPostgre().GetProductByCode(ctx, req.Code)
+		product, err = u.DB.GetPostgre().GetProductByCode(ctx, tenant, req.Code)
 		if err != nil && err.Error() != "record not found" {
 
 			product.Name = req.Name
@@ -31,7 +31,7 @@ func (u *usecase) SaveProduct(ctx context.Context, req cModels.RegisterProductRe
 			product.StockOnReceive = req.StockOnReceive
 			product.StockPacking = req.StockPacking
 			product.LeadTimeDays = req.LeadTimeDays
-			product.Tenant = req.Tenant
+			product.Tenant = tenant
 
 			err = u.DB.GetPostgre().SaveProduct(ctx, product)
 			if err != nil {
@@ -58,7 +58,7 @@ func (u *usecase) SaveProduct(ctx context.Context, req cModels.RegisterProductRe
 			StockOnReceive:  req.StockOnReceive,
 			StockPacking:    req.StockPacking,
 			LeadTimeDays:    req.LeadTimeDays,
-			Tenant:          req.Tenant,
+			Tenant:          tenant,
 		}
 
 		err = u.DB.GetPostgre().SaveProduct(ctx, product)
