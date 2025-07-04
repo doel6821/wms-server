@@ -12,19 +12,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// @Summary Save Customer
-// @Description Save Customer
-// @ID SaveCustomer
-// @Param body body cModels.RegisterCustomerRequest true "request body"
+// @Summary Save Product
+// @Description Save Product
+// @ID SaveProduct
+// @Param body body cModels.RegisterProductRequest true "request body"
 // @Accept  json
 // @Produce  json
 // @Success 200 {object} models.Response
 // @Failure 400 {object} models.Response
-// @Router /wms-server/v.1/customer [post]
-func (c *v1Controller) SaveCustomer(ctx *gin.Context) {
+// @Router /wms-server/v.1/product [post]
+func (c *v1Controller) SaveProduct(ctx *gin.Context) {
 	trxTime := time.Now()
 	var res hModels.Response
-	var req cModels.RegisterCustomerRequest
+	var req cModels.RegisterProductRequest
 
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -33,15 +33,15 @@ func (c *v1Controller) SaveCustomer(ctx *gin.Context) {
 		return
 	}
 
-	res = c.Usecase.SaveCustomer(ctx, req)
-	c.Logs.WithFields(helpers.GettingResponseLog( ctx, req, res, time.Since(trxTime))).Info("Save Customer List")
+	res = c.Usecase.SaveProduct(ctx, req)
+	c.Logs.WithFields(helpers.GettingResponseLog( ctx, req, res, time.Since(trxTime))).Info("Save Product List")
 	ctx.JSON(http.StatusOK, res)
 }
 
 
-// @Summary Get List Customer
-// @Description Get List Customer 
-// @ID GetListCustomer
+// @Summary Get List Product
+// @Description Get List Product 
+// @ID GetListProduct
 // @Param Authorization header string true "Bearer"
 // @Param page query int true "Page"
 // @Param limit query int true "Limit"
@@ -50,13 +50,14 @@ func (c *v1Controller) SaveCustomer(ctx *gin.Context) {
 // @Produce  json
 // @Success 200 {object} models.Response
 // @Failure 400 {object} models.Response
-// @Router /wms-server/v.1/customer/all [get]
-func (c *v1Controller) ListCustomer(ctx *gin.Context) {
+// @Router /wms-server/v.1/product/all [get]
+func (c *v1Controller) ListProduct(ctx *gin.Context) {
 	trxTime := time.Now()
 	var res hModels.Response
 	var page int
 	var limit int
 	var name string
+	var code string
 	var err error
 	
 	if ctx.Query("page") == "" {
@@ -82,23 +83,25 @@ func (c *v1Controller) ListCustomer(ctx *gin.Context) {
 	}
 
 	name = ctx.Query("name")
+	code = ctx.Query("code")
 	tenant := ctx.GetString("tenant")
-	res = c.Usecase.GetCustomerList(ctx, tenant, name, page, limit)
-	c.Logs.WithFields(helpers.GettingResponseLog( ctx, name, res, time.Since(trxTime))).Info("Get Customer List")
+	
+	res = c.Usecase.GetProductList(ctx, tenant, name, code, page, limit)
+	c.Logs.WithFields(helpers.GettingResponseLog( ctx, name, res, time.Since(trxTime))).Info("Get Product List")
 	ctx.JSON(http.StatusOK, res)
 }
 
-// @Summary Get List Customer
-// @Description Get List Customer 
-// @ID GetListCustomer
+// @Summary Get Product By ID
+// @Description Get Product By ID
+// @ID GetProductByID
 // @Param Authorization header string true "Bearer"
-// @Param id path int true "ID of customer"
+// @Param id path int true "ID of Product"
 // @Accept  json
 // @Produce  json
 // @Success 200 {object} models.Response
 // @Failure 400 {object} models.Response
-// @Router /wms-server/v.1/customer/{id} [get]
-func (c *v1Controller) GetCustomerById(ctx *gin.Context) {
+// @Router /wms-server/v.1/product/{id} [get]
+func (c *v1Controller) GetProductById(ctx *gin.Context) {
 	trxTime := time.Now()
 	var res hModels.Response
 	var id int
@@ -111,22 +114,22 @@ func (c *v1Controller) GetCustomerById(ctx *gin.Context) {
 		return	
 	}
 
-	res = c.Usecase.GetCustomerId(ctx, int64(id))
-	c.Logs.WithFields(helpers.GettingResponseLog( ctx, id, res, time.Since(trxTime))).Info("Get Customer By ID")
+	res = c.Usecase.GetProductId(ctx, int64(id))
+	c.Logs.WithFields(helpers.GettingResponseLog( ctx, id, res, time.Since(trxTime))).Info("Get Product By ID")
 	ctx.JSON(http.StatusOK, res)
 }
 
-// @Summary Delete Customer
-// @Description Delete Customer 
-// @ID DeleteCustomer
+// @Summary Delete Product
+// @Description Delete Product 
+// @ID DeleteProduct
 // @Param Authorization header string true "Bearer"
-// @Param id path int true "ID of customer"
+// @Param id path int true "ID of Product"
 // @Accept  json
 // @Produce  json
 // @Success 200 {object} models.Response
 // @Failure 400 {object} models.Response
-// @Router /wms-server/v.1/customer/{id} [delete]
-func (c *v1Controller) DeleteCustomerById(ctx *gin.Context) {
+// @Router /wms-server/v.1/product/{id} [delete]
+func (c *v1Controller) DeleteProductById(ctx *gin.Context) {
 	trxTime := time.Now()
 	var res hModels.Response
 	var id int
@@ -139,7 +142,7 @@ func (c *v1Controller) DeleteCustomerById(ctx *gin.Context) {
 		return	
 	}
 
-	res = c.Usecase.DeleteCustomerId(ctx, int64(id))
-	c.Logs.WithFields(helpers.GettingResponseLog( ctx, id, res, time.Since(trxTime))).Info("Delete Customer")
+	res = c.Usecase.DeleteProductId(ctx, int64(id))
+	c.Logs.WithFields(helpers.GettingResponseLog( ctx, id, res, time.Since(trxTime))).Info("Delete Product")
 	ctx.JSON(http.StatusOK, res)
 }

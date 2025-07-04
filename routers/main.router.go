@@ -117,11 +117,11 @@ func (r *Router) routerControllers() {
 		customer.POST("/", r.Controller.V1().SaveCustomer)
 		customer.DELETE("/:id", r.Controller.V1().DeleteCustomerById)
 
-		// product := v1.Group("/product")
-		// product.GET("/all", r.Controller.V1().)
-		// product.GET("/:id", r.Controller.V1().)
-		// product.POST("/", r.Controller.V1().)
-		// product.DELETE("/:id", r.Controller.V1().)
+		product := v1.Group("/product")
+		product.GET("/all", r.Controller.V1().ListProduct)
+		product.GET("/:id", r.Controller.V1().GetProductById)
+		product.POST("/", r.Controller.V1().SaveProduct)
+		product.DELETE("/:id", r.Controller.V1().DeleteProductById)
 
 		// sales := v1.Group("/sales")
 		// sales.GET("/all", r.Controller.V1().)

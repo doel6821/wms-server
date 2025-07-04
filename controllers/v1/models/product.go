@@ -1,6 +1,6 @@
 package models
 
-type Product struct {
+type RegisterProductRequest struct {
 	ID              uint    `json:"id"`
 	Code            string  `json:"code"`
 	Name            string  `json:"name"`
@@ -13,9 +13,6 @@ type Product struct {
 	StockOnPurchase int     `json:"stockOnPurchase"`
 	StockOnReceive  int     `json:"stockOnReceive"`
 	LeadTimeDays    int     `json:"leadTimeDays"`
-	Tenant          string  `json:"tenant"`
+	Tenant          string `json:"tenant"`
 }
 
-func (c *Product) TableName() string {
-	return "product"
-}

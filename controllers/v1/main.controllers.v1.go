@@ -27,6 +27,11 @@ type (
 		ListCustomer(ctx *gin.Context)
 		GetCustomerById(ctx *gin.Context)
 		DeleteCustomerById(ctx *gin.Context)
+
+		SaveProduct(ctx *gin.Context)
+		ListProduct(ctx *gin.Context)
+		GetProductById(ctx *gin.Context)
+		DeleteProductById(ctx *gin.Context)
 		// END __INCLUDE_TEMPLATE__
 	}
 )

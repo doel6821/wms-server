@@ -24,10 +24,14 @@ type (
 		RegisterTenant(ctx context.Context, req cModels.RegisterRequest) hModels.Response
 
 		SaveCustomer(ctx context.Context, req cModels.RegisterCustomerRequest) hModels.Response
-		GetCustomerList(ctx context.Context, name string, page , limit int) hModels.Response
+		GetCustomerList(ctx context.Context, tenant, name string, page , limit int) hModels.Response
 		GetCustomerId(ctx context.Context, id int64) hModels.Response
 		DeleteCustomerId(ctx context.Context, id int64) hModels.Response
 
+		SaveProduct(ctx context.Context, req cModels.RegisterProductRequest) hModels.Response
+		GetProductList(ctx context.Context,tenant, name, code string, page, limit int) hModels.Response
+		GetProductId(ctx context.Context, id int64) hModels.Response
+		DeleteProductId(ctx context.Context, id int64) hModels.Response 
 		// END __INCLUDE_TEMPLATE__
 	}
 )

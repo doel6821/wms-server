@@ -64,12 +64,12 @@ func (u *usecase) SaveCustomer(ctx context.Context, req cModels.RegisterCustomer
 	return res
 }
 
-func (u *usecase) GetCustomerList(ctx context.Context, name string, page , limit int) hModels.Response {
+func (u *usecase) GetCustomerList(ctx context.Context,tenant, name string, page , limit int) hModels.Response {
 	res := hModels.Response{
 		Meta: helpers.GetNewMetaResponse("en", constants.RC_GENERAL_ERROR),
 	}
 
-	listCustomer, total, err := u.DB.GetPostgre().GetCustomerList(ctx, name, page, limit)
+	listCustomer, total, err := u.DB.GetPostgre().GetCustomerList(ctx,tenant, name, page, limit)
 	if err != nil {
 		u.Logs.WithContext(ctx).WithError(err).Error("failed get customer list")
 		res.Meta = helpers.GetNewMetaResponse("en", constants.RC_GENERAL_ERROR)
