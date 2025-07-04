@@ -39,6 +39,8 @@ type (
 		GetProductByCode(ctx context.Context, code string) (data models.Product, err error)
 		DeleteProductById(ctx context.Context, id int64)  error
 
+		SaveDemand(ctx context.Context, data models.Demand) (error)
+		GetDemandByProductId(ctx context.Context, productId int64) (data models.Demand, err error)
 	}
 )
 

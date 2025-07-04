@@ -28,6 +28,7 @@ func (u *usecase) SaveCustomer(ctx context.Context, req cModels.RegisterCustomer
 			customer.Tenant = strings.ToUpper(req.Tenant)
 			customer.TermOfPayment = req.TermOfPayment
 			customer.DiscountPercent = req.DiscountPercent
+			customer.CancelOnBackOrder = req.CancelOnBackOrder
 
 			err = u.DB.GetPostgre().SaveCustomers(ctx, customer)
 			if err != nil {
@@ -42,14 +43,15 @@ func (u *usecase) SaveCustomer(ctx context.Context, req cModels.RegisterCustomer
 		}
 	} else {
 		customer = pModels.Customers{
-			ID:              uint64(req.ID),
-			Name:            req.Name,
-			Email:           strings.ToLower(req.Email),
-			Phone:           req.Phone,
-			Address:         req.Address,
-			Tenant:          strings.ToUpper(req.Tenant),
-			TermOfPayment:   req.TermOfPayment,
-			DiscountPercent: req.DiscountPercent,
+			ID:                uint64(req.ID),
+			Name:              req.Name,
+			Email:             strings.ToLower(req.Email),
+			Phone:             req.Phone,
+			Address:           req.Address,
+			Tenant:            strings.ToUpper(req.Tenant),
+			TermOfPayment:     req.TermOfPayment,
+			DiscountPercent:   req.DiscountPercent,
+			CancelOnBackOrder: req.CancelOnBackOrder,
 		}
 
 		err = u.DB.GetPostgre().SaveCustomers(ctx, customer)
@@ -64,12 +66,12 @@ func (u *usecase) SaveCustomer(ctx context.Context, req cModels.RegisterCustomer
 	return res
 }
 
-func (u *usecase) GetCustomerList(ctx context.Context,tenant, name string, page , limit int) hModels.Response {
+func (u *usecase) GetCustomerList(ctx context.Context, tenant, name string, page, limit int) hModels.Response {
 	res := hModels.Response{
 		Meta: helpers.GetNewMetaResponse("en", constants.RC_GENERAL_ERROR),
 	}
 
-	listCustomer, total, err := u.DB.GetPostgre().GetCustomerList(ctx,tenant, name, page, limit)
+	listCustomer, total, err := u.DB.GetPostgre().GetCustomerList(ctx, tenant, name, page, limit)
 	if err != nil {
 		u.Logs.WithContext(ctx).WithError(err).Error("failed get customer list")
 		res.Meta = helpers.GetNewMetaResponse("en", constants.RC_GENERAL_ERROR)
@@ -97,19 +99,18 @@ func (u *usecase) GetCustomerId(ctx context.Context, id int64) hModels.Response 
 	return res
 }
 
-
 func (u *usecase) DeleteCustomerId(ctx context.Context, id int64) hModels.Response {
 	res := hModels.Response{
 		Meta: helpers.GetNewMetaResponse("en", constants.RC_GENERAL_ERROR),
 	}
 
 	err := u.DB.GetPostgre().DeleteCustomerById(ctx, id)
-	if err != nil && err.Error() != "record not found"{
+	if err != nil && err.Error() != "record not found" {
 		u.Logs.WithContext(ctx).WithError(err).Error("failed get customer")
 		res.Meta = helpers.GetNewMetaResponse("en", constants.RC_GENERAL_ERROR)
 		return res
 	}
-	
+
 	res.Meta = helpers.GetNewMetaResponse("en", constants.RC_SUCCESS)
 	return res
 }
