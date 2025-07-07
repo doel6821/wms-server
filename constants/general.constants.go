@@ -16,4 +16,5 @@ const (
 const (
 	LOG_OTHER = "OTHER_LOGS"
 	LOG_QUERY = "QUERY_LOGS"
+	START     = "Start"
 )
