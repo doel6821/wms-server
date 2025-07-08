@@ -1,9 +1,9 @@
 package models
 
 type Demand struct {
-	ID        uint64 `json:"id"`
-	ProductId uint64 `json:"productId"`
-	Month     int64  `json:"month"`
+	ID        int64  `json:"id"`
+	ProductId int64  `json:"productId"`
+	Month     string `json:"month"`
 	NQty      int64  `json:"nQty"`
 	N1Qty     int64  `json:"n1Qty"`
 	N2Qty     int64  `json:"n2Qty"`

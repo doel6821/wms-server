@@ -129,10 +129,10 @@ func (r *Router) routerControllers() {
 		location.POST("/", r.Controller.V1().SaveLocation)
 		location.DELETE("/:id", r.Controller.V1().DeleteLocationById)
 
-		// sales := v1.Group("/sales")
-		// sales.GET("/all", r.Controller.V1().)
-		// sales.GET("/:id", r.Controller.V1().)
-		// sales.POST("/", r.Controller.V1().)
+		sales := v1.Group("/sales-order")
+		sales.GET("/all", r.Controller.V1().ListSalesOrder)
+		sales.GET("/:id", r.Controller.V1().GetSalesOrderById)
+		sales.POST("/", r.Controller.V1().SaveSalesOrder)
 
 		// packing := v1.Group("/packing")
 		// packing.GET("/all", r.Controller.V1().)

@@ -37,7 +37,10 @@ type (
 		ListLocation(ctx *gin.Context)
 		GetLocationByCode(ctx *gin.Context)
 		DeleteLocationById(ctx *gin.Context)
-		
+
+		SaveSalesOrder(ctx *gin.Context) 
+		ListSalesOrder(ctx *gin.Context) 
+		GetSalesOrderById(ctx *gin.Context)
 	}
 )
 

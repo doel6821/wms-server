@@ -6,11 +6,11 @@ import (
 )
 
 // SaveDemand ...
-func (d *postgreDatabase) SaveDemand(ctx context.Context, data models.Demand) (error) {
+func (d *postgreDatabase) SaveDemand(ctx context.Context, data []*models.Demand) (error) {
 	d.Logs.WithContext(ctx).WithField("data", data).Info("SaveDemand")
 	query := d.Db.WithContext(ctx)
 
-	if err := query.Save(&data).Error; err != nil {
+	if err := query.Save(data).Error; err != nil {
 		d.Logs.WithContext(ctx).WithError(err).Error("Error save Demand")
 		return err
 	}

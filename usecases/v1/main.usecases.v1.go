@@ -37,7 +37,10 @@ type (
 		GetLocationList(ctx context.Context, tenant string) hModels.Response
 		GetLocationByCode(ctx context.Context, tenant, code string) hModels.Response
 		DeleteLocationId(ctx context.Context, id int64) hModels.Response
-		
+
+		CreateSalesOrder(ctx context.Context, tenant string, req cModels.SalesOrderRequest) hModels.Response
+		GetSalesOrderList(ctx context.Context,tenant string, customerId int64, page, limit int) hModels.Response
+		GetSalesOrderDetailById(ctx context.Context, id int64) hModels.Response
 	}
 )
 

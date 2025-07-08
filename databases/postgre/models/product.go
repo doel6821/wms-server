@@ -9,6 +9,7 @@ type Product struct {
 	AvgPrice        float64 `json:"avgPrice"`
 	StockOnHand     int     `json:"stockOnHand"`
 	StockAllocation int     `json:"stockAllocation"`
+	StockBackOrder  int     `json:"stockBackOrder"`
 	StockPacking    int     `json:"stockPacking"`
 	StockOnPurchase int     `json:"stockOnPurchase"`
 	StockOnReceive  int     `json:"stockOnReceive"`

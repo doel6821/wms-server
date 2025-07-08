@@ -18,3 +18,11 @@ const (
 	LOG_QUERY = "QUERY_LOGS"
 	START     = "Start"
 )
+
+const (
+	PENDING       = "pending"
+	ON_PROCESS    = "on process"
+	ON_PACKING    = "on packing"
+	ON_ALLOCATION = "on allocation"
+	COMPLETE      = "complete"
+)

@@ -21,7 +21,7 @@ func (d *postgreDatabase) SaveSalesOrder(ctx context.Context, data models.SalesO
 }
 
 // GetList ...
-func (d *postgreDatabase) GetSalesOrderList(ctx context.Context, tenant, customerId int64, page, limit int) ([]models.SalesOrder, int64, error) {
+func (d *postgreDatabase) GetSalesOrderList(ctx context.Context, tenant string, customerId int64, page, limit int) ([]models.SalesOrder, int64, error) {
 	query := d.Db.WithContext(ctx)
 
 	var res []models.SalesOrder
@@ -55,10 +55,14 @@ func (d *postgreDatabase) GetSalesOrderById(ctx context.Context, id int64) (data
 	return data, nil
 }
 
-func (d *postgreDatabase) TxSalesOrder(ctx context.Context, reqSalesOrder models.SalesOrder, reqSalesOrderItem []models.SalesOrderItem) error {
+func (d *postgreDatabase) TxSalesOrder(ctx context.Context, reqSalesOrder models.SalesOrder, reqSalesOrderItem []models.SalesOrderItem, reqProductItems []models.Product, reqDemand []models.Demand) error {
 	query := d.Db.WithContext(ctx).Begin()
 
 	query.SavePoint(constants.START)
+	if err := d.TxSaveProductItems(ctx, query, reqProductItems) ; err != nil {
+		query.RollbackTo(constants.START)
+		return err
+	}
 
 	if err := d.TxSaveSalesOrder(ctx, query, reqSalesOrder); err != nil {
 		query.RollbackTo(constants.START)
@@ -66,6 +70,11 @@ func (d *postgreDatabase) TxSalesOrder(ctx context.Context, reqSalesOrder models
 	}
 
 	if err := d.TxSaveSalesOrderItems(ctx, query, reqSalesOrderItem); err != nil {
+		query.RollbackTo(constants.START)
+		return err
+	}
+
+	if err := d.TxSaveDemands(ctx, query, reqDemand); err != nil {
 		query.RollbackTo(constants.START)
 		return err
 	}
@@ -89,6 +98,30 @@ func (d *postgreDatabase) TxSaveSalesOrder(ctx context.Context, query *gorm.DB, 
 
 func (d *postgreDatabase) TxSaveSalesOrderItems(ctx context.Context, query *gorm.DB, reqSalesOrderItem []models.SalesOrderItem) error {
 	for _, v := range reqSalesOrderItem {
+		if v.ID == 0 {
+			if err := query.Create(&v).Error; err != nil {
+				return err
+			}
+		} else {
+			if err := query.Model(&v).Updates(v).Error; err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func (d *postgreDatabase) TxSaveProductItems(ctx context.Context, query *gorm.DB, reqProductItems []models.Product) error {
+	for _, v := range reqProductItems {	
+		if err := query.Model(&v).Updates(v).Error; err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (d *postgreDatabase) TxSaveDemands(ctx context.Context, query *gorm.DB, reqDemand []models.Demand) error {
+	for _, v := range reqDemand {
 		if v.ID == 0 {
 			if err := query.Create(&v).Error; err != nil {
 				return err

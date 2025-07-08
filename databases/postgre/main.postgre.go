@@ -39,7 +39,7 @@ type (
 		GetProductByCode(ctx context.Context, tenant, code string) (data models.Product, err error)
 		DeleteProductById(ctx context.Context, id int64)  error
 
-		SaveDemand(ctx context.Context, data models.Demand) (error)
+		SaveDemand(ctx context.Context, data []*models.Demand) (error)
 		GetDemandByProductId(ctx context.Context, productId int64) (data models.Demand, err error)
 
 		SaveLocation(ctx context.Context, data models.Location) (error)
@@ -48,9 +48,9 @@ type (
 		DeleteLocationById(ctx context.Context, id int64)  error
 
 		SaveSalesOrder(ctx context.Context, data models.SalesOrder) error
-		GetSalesOrderList(ctx context.Context, tenant, customerId int64, page, limit int) ([]models.SalesOrder, int64, error)
+		GetSalesOrderList(ctx context.Context, tenant string, customerId int64, page, limit int) ([]models.SalesOrder, int64, error)
 		GetSalesOrderById(ctx context.Context, id int64) (data models.SalesOrderResponse, err error)
-		TxSalesOrder(ctx context.Context, reqSalesOrder models.SalesOrder, reqSalesOrderItem []models.SalesOrderItem) error
+		TxSalesOrder(ctx context.Context, reqSalesOrder models.SalesOrder, reqSalesOrderItem []models.SalesOrderItem, reqProductItems []models.Product, reqDemand []models.Demand) error
 
 		SaveSalesOrderItem(ctx context.Context, data []*models.SalesOrderItem) (error)
 		GetSalesOrderItemList(ctx context.Context, SalesOrderId int64) ( []models.SalesOrderItem, error)
