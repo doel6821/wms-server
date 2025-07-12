@@ -8,12 +8,12 @@ import (
 
 // HealthCheck ...
 func (u *usecase) HealthCheck(ctx context.Context) hModels.Response {
-	rHc := u.DB.GetRedis().HeatchCheck(ctx)
+	// rHc := u.DB.GetRedis().HeatchCheck(ctx)
 	dHc := u.DB.GetPostgre().HealthCheck(ctx)
 	
 	res := helpers.GenerateResponseHealthCheck(
 		dHc,
-		rHc,
+		// rHc,
 	)
 	return res
 }

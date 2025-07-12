@@ -48,7 +48,7 @@ func (d *postgreDatabase) GetProductList(ctx context.Context, tenant, name, code
 func (d *postgreDatabase) GetProductById(ctx context.Context, id int64) (data models.Product, err error) {
 	query := d.Db.WithContext(ctx)
 	
-	if err = query.Where("id = ?", id).First(&data).Error; err != nil {
+	if err = query.Preload("ProductLocation").First(&data, id).Error; err != nil {
 		d.Logs.WithContext(ctx).WithError(err).Error("Error getting existing data")
 		return data, err
 	}

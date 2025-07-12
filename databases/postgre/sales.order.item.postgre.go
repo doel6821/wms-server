@@ -3,6 +3,7 @@ package postgre
 import (
 	"context"
 	"wms-server/databases/postgre/models"
+	"wms-server/helpers"
 )
 
 // SaveSalesOrderItem ...
@@ -38,6 +39,29 @@ func (d *postgreDatabase) GetSalesOrderItemById(ctx context.Context, id int64) (
 	query := d.Db.WithContext(ctx)
 	
 	if err = query.Where("id = ?", id).First(&data).Error; err != nil {
+		d.Logs.WithContext(ctx).WithError(err).Error("Error getting existing data")
+		return data, err
+	}
+	return data, nil
+}
+
+// GetSalesOrderItemByAllocation ...
+func (d *postgreDatabase) GetSalesOrderItemByAllocation(ctx context.Context, ids []int) (data []models.SalesOrderItem, err error) {
+	query := d.Db.WithContext(ctx)
+	
+	if err = query.Where("id in (" + helpers.JoinInts(ids, ",") + ") anda allocation_order_quantity > 0").Find(&data).Error; err != nil {
+		d.Logs.WithContext(ctx).WithError(err).Error("Error getting existing data")
+		return data, err
+	}
+	return data, nil
+}
+
+
+// GetSalesOrderItemBySalesOrderId ...
+func (d *postgreDatabase) GetSalesOrderItemBySalesOrderId(ctx context.Context, salesOrderId, productId int64) (data models.SalesOrderItem, err error) {
+	query := d.Db.WithContext(ctx)
+	
+	if err = query.Where("sales_order_id = ? and product_id = ?", salesOrderId, productId).First(&data).Error; err != nil {
 		d.Logs.WithContext(ctx).WithError(err).Error("Error getting existing data")
 		return data, err
 	}

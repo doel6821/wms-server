@@ -10,7 +10,7 @@ import (
 	"syscall"
 	"wms-server/databases"
 	"wms-server/databases/postgre"
-	"wms-server/databases/redis"
+	// "wms-server/databases/redis"
 	"wms-server/helpers"
 	"wms-server/routers"
 	"wms-server/scheduler"
@@ -26,12 +26,12 @@ func main() {
 	pConn := postgre.ConnectPostgre(logger)
 	psql := postgre.InitializePostgreDatabase(pConn, logger)
 	
-	rConn := redis.ConnectRedis()
-	rds := redis.InitializeRedis(rConn, logger)
+	// rConn := redis.ConnectRedis()
+	// rds := redis.InitializeRedis(rConn, logger)
 	
 	db := databases.InitializeDatabase(
 		psql,
-		rds,
+		// rds,
 		logger,
 	)
 	

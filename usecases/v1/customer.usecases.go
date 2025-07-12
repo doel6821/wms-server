@@ -43,7 +43,7 @@ func (u *usecase) SaveCustomer(ctx context.Context, req cModels.RegisterCustomer
 		}
 	} else {
 		customer = pModels.Customers{
-			ID:                uint64(req.ID),
+			ID:                req.ID,
 			Name:              req.Name,
 			Email:             strings.ToLower(req.Email),
 			Phone:             req.Phone,

@@ -134,15 +134,15 @@ func (r *Router) routerControllers() {
 		sales.GET("/:id", r.Controller.V1().GetSalesOrderById)
 		sales.POST("/", r.Controller.V1().SaveSalesOrder)
 
-		// packing := v1.Group("/packing")
-		// packing.GET("/all", r.Controller.V1().)
-		// packing.GET("/:id", r.Controller.V1().)
-		// packing.POST("/", r.Controller.V1().)
+		packing := v1.Group("/packing-order")
+		packing.GET("/all", r.Controller.V1().ListPackingOrder)
+		packing.GET("/:id", r.Controller.V1().GetPackingOrderDetailById)
+		packing.POST("/", r.Controller.V1().SavePackingOrder)
 
-		// invoice := v1.Group("/invoice")
-		// invoice.GET("/all", r.Controller.V1().)
-		// invoice.GET("/:id", r.Controller.V1().)
-		// invoice.POST("/", r.Controller.V1().)
+		invoice := v1.Group("/invoice")
+		invoice.GET("/all", r.Controller.V1().ListInvoice)
+		invoice.GET("/:id", r.Controller.V1().GetInvoiceDetailById)
+		invoice.POST("/", r.Controller.V1().SaveInvoice)
 
 		// purchase := v1.Group("/purchase")
 		// purchase.GET("/all", r.Controller.V1().)

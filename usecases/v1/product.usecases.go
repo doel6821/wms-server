@@ -46,7 +46,7 @@ func (u *usecase) SaveProduct(ctx context.Context, tenant string, req cModels.Re
 		}
 	} else {
 		product = pModels.Product{
-			ID:              uint(req.ID),
+			ID:              req.ID,
 			Name:            req.Name,
 			Code:            req.Code,
 			HETPrice:        req.HETPrice,

@@ -11,7 +11,6 @@ type SalesOrder struct {
 	Amount     float64   `json:"amount"`
 	Discount   int       `json:"discount"`
 	Total      float64   `json:"totalAmount"`
-	Status     string    `json:"status"`
 	Tenant     string    `json:"tenant"`
 }
 
@@ -20,13 +19,12 @@ func (c *SalesOrder) TableName() string {
 }
 
 type SalesOrderResponse struct {
-	ID         uint                `json:"id"`
-	CustomerId uint                `json:"customerId"`
+	ID         int64               `json:"id"`
+	CustomerId int64               `json:"customerId"`
 	OrderDate  time.Time           `json:"orderDate"`
 	Amount     float64             `json:"amount"`
 	Discount   int                 `json:"discount"`
 	Total      float64             `json:"totalAmount"`
-	Status     string              `json:"status"`
 	Tenant     string              `json:"tenant"`
 	OrderItems []SalesOrderItemRes `json:"orderItems" gorm:"foreignKey:SalesOrderID"`
 }

@@ -2,7 +2,7 @@ package databases
 
 import (
 	"wms-server/databases/postgre"
-	"wms-server/databases/redis"
+	// "wms-server/databases/redis"
 	logs "github.com/sirupsen/logrus"
 )
 
@@ -10,23 +10,23 @@ import (
 type (
 	database struct {
 		Postgre postgre.PostgreDatabase
-		Redis redis.RedisDatabase
+		// Redis redis.RedisDatabase
 	}
 	Database interface {
 		GetPostgre() postgre.PostgreDatabase
-		GetRedis() redis.RedisDatabase
+		// GetRedis() redis.RedisDatabase
 	}
 )
 
 // InitializeDatabase ..
 func InitializeDatabase(
 	psqlCon postgre.PostgreDatabase,
-	redisCon redis.RedisDatabase,
+	// redisCon redis.RedisDatabase,
 	l *logs.Logger,
 ) Database {
 	return &database{
 		Postgre: psqlCon,
-		Redis: redisCon,
+		// Redis: redisCon,
 	}
 }
 
@@ -37,6 +37,6 @@ func (d *database) GetPostgre() postgre.PostgreDatabase {
 }
 
 // GetRedis for get connection redis ...
-func (d *database) GetRedis() redis.RedisDatabase {
-	return d.Redis
-}
+// func (d *database) GetRedis() redis.RedisDatabase {
+// 	return d.Redis
+// }

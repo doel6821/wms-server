@@ -41,6 +41,14 @@ type (
 		CreateSalesOrder(ctx context.Context, tenant string, req cModels.SalesOrderRequest) hModels.Response
 		GetSalesOrderList(ctx context.Context,tenant string, customerId int64, page, limit int) hModels.Response
 		GetSalesOrderDetailById(ctx context.Context, id int64) hModels.Response
+
+		CreatePackingOrder(ctx context.Context, tenant string, req cModels.PackingOrderRequest) hModels.Response
+		GetPackingOrderList(ctx context.Context,tenant string, customerId int64, page, limit int) hModels.Response
+		GetPackingOrderDetailById(ctx context.Context, id int64) hModels.Response
+
+		CreateInvoice(ctx context.Context, tenant string, req cModels.InvoiceRequest) hModels.Response 
+		GetInvoiceList(ctx context.Context,tenant string, customerId int64, page, limit int) hModels.Response
+		GetInvoiceDetailById(ctx context.Context, id int64) hModels.Response
 	}
 )
 

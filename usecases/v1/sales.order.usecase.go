@@ -30,7 +30,6 @@ func (u *usecase) CreateSalesOrder(ctx context.Context, tenant string, req cMode
 		Amount     : req.Amount ,
 		Discount   : req.Discount ,
 		Total      : req.TotalAmount ,
-		Status     : constants.PENDING ,
 		Tenant     : tenant ,
 	}
 

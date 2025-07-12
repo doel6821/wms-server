@@ -22,7 +22,7 @@ func (d *postgreDatabase) SavePackingOrder(ctx context.Context, data models.Pack
 
 
 // GetList ...
-func (d *postgreDatabase) GetPackingOrderList(ctx context.Context, tenant, customerId int64, page , limit int) ( []models.PackingOrder, int64, error) {
+func (d *postgreDatabase) GetPackingOrderList(ctx context.Context, tenant string, customerId int64, page , limit int) ( []models.PackingOrder, int64, error) {
 	query := d.Db.WithContext(ctx)
 	
 	var res []models.PackingOrder
@@ -56,8 +56,35 @@ func (d *postgreDatabase) GetPackingOrderById(ctx context.Context, id int64) (da
 	return data, nil
 }
 
+// UpdatePackingOrderById ...
+func (d *postgreDatabase) UpdatePackingOrder(ctx context.Context, data models.PackingOrder)  error {
+	query := d.Db.WithContext(ctx)
 
-func (d *postgreDatabase) TxPackingOrder(ctx context.Context, reqPackingOrder models.PackingOrder, reqPackingOrderItem []models.PackingOrderItem ) error {
+    err := query.Updates(&data).Error
+	if err != nil {
+		d.Logs.WithContext(ctx).WithError(err).Error("Error getting existing data")
+		return err
+	}
+	return nil
+}
+
+// UpdatePackingOrderById ...
+func (d *postgreDatabase) UpdateStatusPackingOrder(ctx context.Context, id int64, status string)  error {
+	query := d.Db.WithContext(ctx)
+
+    err := query.Model(&models.PackingOrder{}).Where("id = ?", id).Update("status", status).Error
+	if err != nil {
+		d.Logs.WithContext(ctx).WithError(err).Error("Error getting existing data")
+		return err
+	}
+	return nil
+}
+
+// save packing order & packing order items
+// update sales order item allocation to pick
+// update product allocation to packing 
+
+func (d *postgreDatabase) TxPackingOrder(ctx context.Context, reqPackingOrder models.PackingOrder, reqPackingOrderItem []models.PackingOrderItem , reqSalesOrderItems []models.SalesOrderItem, reqProducts []models.Product) error {
 	query := d.Db.WithContext(ctx).Begin()
 
 	query.SavePoint(constants.START)
@@ -68,6 +95,16 @@ func (d *postgreDatabase) TxPackingOrder(ctx context.Context, reqPackingOrder mo
 	}
 
 	if err := d.TxSavePackingOrderItems(ctx ,query, reqPackingOrderItem); err != nil {
+		query.RollbackTo(constants.START)
+		return err
+	}
+
+	if err := d.TxUpdateSalesOrderItems(ctx ,query, reqSalesOrderItems); err != nil {
+		query.RollbackTo(constants.START)
+		return err
+	}
+
+	if err := d.TxUpdateProducts(ctx ,query, reqProducts); err != nil {
 		query.RollbackTo(constants.START)
 		return err
 	}
@@ -104,6 +141,3 @@ func (d *postgreDatabase) TxSavePackingOrderItems(ctx context.Context, query *go
 	}
 	return nil
 }
-
-
-

@@ -47,6 +47,10 @@ type (
 		GetLocationByLocationCode(ctx context.Context,tenant, locationCode string) (data models.Location, err error)
 		DeleteLocationById(ctx context.Context, id int64)  error
 
+		SaveProductLocation(ctx context.Context, data []*models.ProductLocation) (error)
+		GetProductLocationByLocationCode(ctx context.Context,productId int64, locationCode string) (data models.ProductLocation, err error)
+		GetProductLocationByProductId(ctx context.Context,productId int64) (data []models.ProductLocation, err error)
+		
 		SaveSalesOrder(ctx context.Context, data models.SalesOrder) error
 		GetSalesOrderList(ctx context.Context, tenant string, customerId int64, page, limit int) ([]models.SalesOrder, int64, error)
 		GetSalesOrderById(ctx context.Context, id int64) (data models.SalesOrderResponse, err error)
@@ -55,25 +59,29 @@ type (
 		SaveSalesOrderItem(ctx context.Context, data []*models.SalesOrderItem) (error)
 		GetSalesOrderItemList(ctx context.Context, SalesOrderId int64) ( []models.SalesOrderItem, error)
 		GetSalesOrderItemById(ctx context.Context, id int64) (data models.SalesOrderItem, err error)
+		GetSalesOrderItemBySalesOrderId(ctx context.Context, salesOrderId, productId int64) (data models.SalesOrderItem, err error)
+		GetSalesOrderItemByAllocation(ctx context.Context, ids []int) (data []models.SalesOrderItem, err error)
 
 		SavePackingOrder(ctx context.Context, data models.PackingOrder) (error)
-		GetPackingOrderList(ctx context.Context, tenant, customerId int64, page , limit int) ( []models.PackingOrder, int64, error)
+		GetPackingOrderList(ctx context.Context, tenant string, customerId int64, page , limit int) ( []models.PackingOrder, int64, error)
 		GetPackingOrderById(ctx context.Context, id int64) (data models.PackingOrderResponse, err error)
-		TxPackingOrder(ctx context.Context, reqPackingOrder models.PackingOrder, reqPackingOrderItem []models.PackingOrderItem ) error
+		UpdateStatusPackingOrder(ctx context.Context, id int64, status string)  error
+		TxPackingOrder(ctx context.Context, reqPackingOrder models.PackingOrder, reqPackingOrderItem []models.PackingOrderItem , reqSalesOrderItems []models.SalesOrderItem, reqProducts []models.Product) error
 
 		SavePackingOrderItem(ctx context.Context, data []*models.PackingOrderItem) (error)
 		GetPackingOrderItemList(ctx context.Context, PackingOrderId int64) ( []models.PackingOrderItem, error)
 		GetPackingOrderItemById(ctx context.Context, id int64) (data models.PackingOrderItem, err error) 
+		UpdatePackingOrder(ctx context.Context, data models.PackingOrder)  error
 
 		SaveInvoiceOrder(ctx context.Context, data models.InvoiceOrder) (error)
-		GetInvoiceOrderList(ctx context.Context, tenant, customerId int64, page , limit int) ( []models.InvoiceOrder, int64, error)
+		GetInvoiceList(ctx context.Context, tenant string, customerId int64, page , limit int) ( []models.InvoiceOrder, int64, error)
 		GetInvoiceOrderById(ctx context.Context, id int64) (data models.InvoiceOrderResponse, err error)
-		TxInvoiceOrder(ctx context.Context, reqInvoiceOrder models.InvoiceOrder, reqInvoiceOrderItem []models.InvoiceOrderItem ) error
+		TxInvoiceOrder(ctx context.Context, reqInvoiceOrder models.InvoiceOrder, reqInvoiceOrderItem []models.InvoiceOrderItem, reqPackingOrder models.PackingOrder, reqSalesOrderItem []models.SalesOrderItem, products []models.Product, productLocations []models.ProductLocation ) error
+		
 
 		SaveInvoiceOrderItem(ctx context.Context, data []*models.InvoiceOrderItem) (error)
 		GetInvoiceOrderItemList(ctx context.Context, InvoiceOrderId int64) ( []models.InvoiceOrderItem, error)
 		GetInvoiceOrderItemById(ctx context.Context, id int64) (data models.InvoiceOrderItem, err error) 
-
 	}
 )
 

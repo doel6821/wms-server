@@ -1,9 +1,10 @@
 package models
 
 type PackingOrderItem struct {
-	ID              uint   `json:"id"`
-	PackingOrderId  uint   `json:"packingOrderId"`
-	ProductId       uint   `json:"productId"`
+	ID              int64  `json:"id"`
+	PackingOrderId  int64  `json:"packingOrderId"`
+	SalesOrderId    int64  `json:"salesOrderId"`
+	ProductId       int64  `json:"productId"`
 	ProductCode     string `json:"productCode"`
 	ProductName     string `json:"productName"`
 	ProductLocation string `json:"productLocation"`
@@ -15,11 +16,14 @@ func (c *PackingOrderItem) TableName() string {
 }
 
 type PackingOrderItemRes struct {
-	ID              uint   `json:"id"`
-	PackingOrderId  uint   `json:"packingOrderId"`
-	ProductId       uint   `json:"productId"`
-	ProductCode     string `json:"productCode"`
-	ProductName     string `json:"productName"`
-	ProductLocation string `json:"productLocation"`
-	PackingOrderQty int    `json:"packingOrderQty"`
+	ID              int64   `json:"id"`
+	PackingOrderId  int64   `json:"packingOrderId"`
+	SalesOrderId    int64   `json:"salesOrderId"`
+	ProductId       int64   `json:"productId"`
+	ProductCode     string  `json:"productCode"`
+	ProductName     string  `json:"productName"`
+	ProductPrice    float64 `json:"productPrice"`
+	LocationId      int64   `json:"locationId"`
+	Location        string  `json:"location"`
+	PackingOrderQty int     `json:"packingOrderQty"`
 }

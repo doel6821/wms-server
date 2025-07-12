@@ -262,4 +262,13 @@ func RoundFloat(input float64, precision int) float64 {
 	return math.Round(input*temp) / temp
 }
 
+func JoinInts(ints []int, sep string) string {
+	strs := make([]string, len(ints))
+	for i, val := range ints {
+		strs[i] = strconv.Itoa(val)
+	}
+	return strings.Join(strs, sep)
+}
+
+
 // END __INCLUDE_TEMPLATE__

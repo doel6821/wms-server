@@ -41,6 +41,14 @@ type (
 		SaveSalesOrder(ctx *gin.Context) 
 		ListSalesOrder(ctx *gin.Context) 
 		GetSalesOrderById(ctx *gin.Context)
+
+		SavePackingOrder(ctx *gin.Context)
+		ListPackingOrder(ctx *gin.Context)
+		GetPackingOrderDetailById(ctx *gin.Context)
+
+		SaveInvoice(ctx *gin.Context)
+		ListInvoice(ctx *gin.Context)
+		GetInvoiceDetailById(ctx *gin.Context)
 	}
 )
 

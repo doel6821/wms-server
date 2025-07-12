@@ -3,11 +3,11 @@ package models
 import "time"
 
 type PackingOrder struct {
-	ID           uint      `json:"id"`
-	SalesOrderId uint      `json:"salesOrderId"`
-	PackingDate  time.Time `json:"packingDate"`
-	Status       string    `json:"status"`
-	Tenant       string    `json:"tenant"`
+	ID          int64     `json:"id"`
+	CustomerId  int64     `json:"customerId"`
+	PackingDate time.Time `json:"packingDate"`
+	Status      string    `json:"status"`
+	Tenant      string    `json:"tenant"`
 }
 
 func (c *PackingOrder) TableName() string {
@@ -15,8 +15,8 @@ func (c *PackingOrder) TableName() string {
 }
 
 type PackingOrderResponse struct {
-	ID           uint                  `json:"id"`
-	SalesOrderId uint                  `json:"salesOrderId"`
+	ID           int64                 `json:"id"`
+	CustomerId   int64                 `json:"customerId"`
 	PackingDate  time.Time             `json:"packingDate"`
 	Status       string                `json:"status"`
 	Tenant       string                `json:"tenant"`

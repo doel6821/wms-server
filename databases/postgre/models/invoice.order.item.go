@@ -1,14 +1,12 @@
 package models
 
 type InvoiceOrderItem struct {
-	ID              uint    `json:"id"`
-	InvoiceOrderId  uint    `json:"invoiceOrderId"`
+	ID              int64    `json:"id"`
+	InvoiceOrderId  int64    `json:"invoiceOrderId"`
 	ProductCode     string  `json:"productCode"`
 	ProductName     string  `json:"productName"`
-	ProductLocation string  `json:"productLocation"`
 	Quantity        int     `json:"quantity"`
 	Price           float64 `json:"price"`
-	Discount        float64 `json:"discount"`
 	Total           float64 `json:"total"`
 }
 
@@ -21,9 +19,7 @@ type InvoiceOrderItemRes struct {
 	InvoiceOrderId  uint    `json:"invoiceOrderId"`
 	ProductCode     string  `json:"productCode"`
 	ProductName     string  `json:"productName"`
-	ProductLocation string  `json:"productLocation"`
 	Quantity        int     `json:"quantity"`
 	Price           float64 `json:"price"`
-	Discount        float64 `json:"discount"`
 	Total           float64 `json:"total"`
 }

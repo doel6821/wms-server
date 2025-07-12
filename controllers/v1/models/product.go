@@ -1,7 +1,7 @@
 package models
 
 type RegisterProductRequest struct {
-	ID              uint    `json:"id"`
+	ID              int64    `json:"id"`
 	Code            string  `json:"code"`
 	Name            string  `json:"name"`
 	HETPrice        float64 `json:"hetPrice"`
