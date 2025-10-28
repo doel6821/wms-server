@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 	"wms-server/constants"
 	"wms-server/helpers/models"
-	"strings"
 
 	"github.com/sirupsen/logrus"
 )
@@ -174,7 +174,7 @@ func extractLanguageCode(filename string) string {
 	return lang
 }
 
-// GetNewMetaResponse mengambil response berdasarkan bahasa, key, dan kode service
+// GetMetaResponse mengambil response berdasarkan bahasa, key, dan kode service
 func GetNewMetaResponse(lang, key string) (response models.MetaData) {
 	onceRegisterCode.Do(func() {
 		LoadMetaFiles("./errorcodes")

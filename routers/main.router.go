@@ -88,9 +88,13 @@ func (r *Router) routerControllers() {
 		ExposeHeaders:    []string{"Content-Length", "Access-Control-Allow-Origin", "Access-Control-Allow-Headers", "Content-Type"},
 		AllowCredentials: true,
 		AllowAllOrigins:  true,
-		//AllowOriginFunc:  func(origin string) bool { return true },
+		// AllowOriginFunc:  func(origin string) bool { return true },
 		MaxAge: 12 * time.Hour,
 	}))
+
+	r.Gin.OPTIONS("/*path", func(c *gin.Context) {
+		c.Status(http.StatusNoContent)
+	})
 
 	r.Gin.Use(r.GinLogger())
 	r.Gin.Use(gin.Recovery())
@@ -108,52 +112,71 @@ func (r *Router) routerControllers() {
 		// version 1
 		v1 := main.Group("/v1")
 		v1.POST("/login", r.Controller.V1().Login)
-		v1.POST("/register-user", r.Controller.V1().RegisterUser)
+		v1.POST("/register-user", r.Controller.V1().CekToken, r.Controller.V1().RegisterUser)
+		v1.POST("/update-user/:id", r.Controller.V1().CekToken, r.Controller.V1().UpdateUser)
 		v1.POST("/register-tenant", r.Controller.V1().RegisterTenant)
+		v1.GET("/user/all", r.Controller.V1().CekToken, r.Controller.V1().ListUser)
 
 		customer := v1.Group("/customer")
-		customer.GET("/all", r.Controller.V1().ListCustomer)
-		customer.GET("/:id", r.Controller.V1().GetCustomerById)
-		customer.POST("/", r.Controller.V1().SaveCustomer)
-		customer.DELETE("/:id", r.Controller.V1().DeleteCustomerById)
+		customer.GET("/all", r.Controller.V1().CekToken, r.Controller.V1().ListCustomer)
+		customer.GET("/:id", r.Controller.V1().CekToken, r.Controller.V1().GetCustomerById)
+		customer.POST("/", r.Controller.V1().CekToken, r.Controller.V1().SaveCustomer)
+		customer.DELETE("/:id", r.Controller.V1().CekToken, r.Controller.V1().DeleteCustomerById)
+
+		supplier := v1.Group("/supplier")
+		supplier.GET("/all", r.Controller.V1().CekToken, r.Controller.V1().ListSupplier)
+		supplier.GET("/:id", r.Controller.V1().CekToken, r.Controller.V1().GetSupplierById)
+		supplier.POST("/", r.Controller.V1().CekToken, r.Controller.V1().SaveSupplier)
+		supplier.DELETE("/:id", r.Controller.V1().CekToken, r.Controller.V1().DeleteSupplierById)
 
 		product := v1.Group("/product")
-		product.GET("/all", r.Controller.V1().ListProduct)
-		product.GET("/:id", r.Controller.V1().GetProductById)
-		product.POST("/", r.Controller.V1().SaveProduct)
-		product.DELETE("/:id", r.Controller.V1().DeleteProductById)
+		product.GET("/all", r.Controller.V1().CekToken, r.Controller.V1().ListProduct)
+		product.GET("/:id", r.Controller.V1().CekToken, r.Controller.V1().GetProductById)
+		product.POST("/", r.Controller.V1().CekToken, r.Controller.V1().SaveProduct)
+		product.DELETE("/:id", r.Controller.V1().CekToken, r.Controller.V1().DeleteProductById)
 
 		location := v1.Group("/location")
-		location.GET("/all", r.Controller.V1().ListLocation)
-		location.GET("/:code", r.Controller.V1().GetLocationByCode)
-		location.POST("/", r.Controller.V1().SaveLocation)
-		location.DELETE("/:id", r.Controller.V1().DeleteLocationById)
+		location.GET("/all", r.Controller.V1().CekToken, r.Controller.V1().ListLocation)
+		// location.GET("/:code", r.Controller.V1().CekToken, r.Controller.V1().GetLocationByCode)
+		location.GET("/:id", r.Controller.V1().CekToken, r.Controller.V1().GetLocationById)
+		location.POST("/", r.Controller.V1().CekToken, r.Controller.V1().SaveLocation)
+		location.DELETE("/:id", r.Controller.V1().CekToken, r.Controller.V1().DeleteLocationById)
 
 		sales := v1.Group("/sales-order")
-		sales.GET("/all", r.Controller.V1().ListSalesOrder)
-		sales.GET("/:id", r.Controller.V1().GetSalesOrderById)
-		sales.POST("/", r.Controller.V1().SaveSalesOrder)
+		sales.GET("/all", r.Controller.V1().CekToken, r.Controller.V1().ListSalesOrder)
+		sales.GET("/:id", r.Controller.V1().CekToken, r.Controller.V1().GetSalesOrderById)
+		sales.POST("", r.Controller.V1().CekToken, r.Controller.V1().SaveSalesOrder)
+
+		salesOrderItem := v1.Group("/sales-order-item")
+		salesOrderItem.GET("", r.Controller.V1().CekToken, r.Controller.V1().GetSalesOrderItemByProductId)
 
 		packing := v1.Group("/packing-order")
-		packing.GET("/all", r.Controller.V1().ListPackingOrder)
-		packing.GET("/:id", r.Controller.V1().GetPackingOrderDetailById)
-		packing.POST("/", r.Controller.V1().SavePackingOrder)
+		packing.GET("/all", r.Controller.V1().CekToken, r.Controller.V1().ListPackingOrder)
+		packing.GET("/:id", r.Controller.V1().CekToken, r.Controller.V1().GetPackingOrderDetailById)
+		packing.POST("/", r.Controller.V1().CekToken, r.Controller.V1().SavePackingOrder)
+
+		packingOrderItem := v1.Group("/packing-order-item")
+		packingOrderItem.GET("/", r.Controller.V1().CekToken, r.Controller.V1().GetPackingOrderItemByProductId)
 
 		invoice := v1.Group("/invoice")
-		invoice.GET("/all", r.Controller.V1().ListInvoice)
-		invoice.GET("/:id", r.Controller.V1().GetInvoiceDetailById)
-		invoice.POST("/", r.Controller.V1().SaveInvoice)
+		invoice.GET("/all", r.Controller.V1().CekToken, r.Controller.V1().ListInvoice)
+		invoice.GET("/:id", r.Controller.V1().CekToken, r.Controller.V1().GetInvoiceDetailById)
+		invoice.POST("/", r.Controller.V1().CekToken, r.Controller.V1().SaveInvoice)
+		invoice.PUT("/", r.Controller.V1().CekToken, r.Controller.V1().UpdateInvoiceOrder)
 
-		// purchase := v1.Group("/purchase")
-		// purchase.GET("/all", r.Controller.V1().)
-		// purchase.GET("/:id", r.Controller.V1().)
-		// purchase.POST("/", r.Controller.V1().)
+		purchase := v1.Group("/purchase")
+		purchase.GET("/all", r.Controller.V1().CekToken, r.Controller.V1().ListPurchaseOrder)
+		purchase.GET("/:id", r.Controller.V1().CekToken, r.Controller.V1().GetPurchaseOrderById)
+		purchase.POST("/", r.Controller.V1().CekToken, r.Controller.V1().SavePurchaseOrder)
 
-		// receive := v1.Group("/receive")
-		// receive.GET("/all", r.Controller.V1().)
-		// receive.GET("/:id", r.Controller.V1().)
-		// receive.POST("/", r.Controller.V1().)
-
+		receive := v1.Group("/receive-order")
+		receive.GET("/available", r.Controller.V1().CekToken, r.Controller.V1().GetAvailableReceive)
+		receive.GET("/all", r.Controller.V1().CekToken, r.Controller.V1().ListReceiveOrder)
+		receive.GET("/:id", r.Controller.V1().CekToken, r.Controller.V1().GetReceiveOrderDetailById)
+		receive.GET("/product/:productId", r.Controller.V1().CekToken, r.Controller.V1().GetReceiveOrderDetailByProductId)
+		receive.POST("/", r.Controller.V1().CekToken, r.Controller.V1().SaveReceiveOrder)
+		receive.POST("/stocked", r.Controller.V1().CekToken, r.Controller.V1().SaveStocked)
+		receive.PUT("/", r.Controller.V1().CekToken, r.Controller.V1().UpdateReceiveOrder)
 		// report := v1.Group("/report")
 		// report.GET("/sales", r.Controller.V1().)
 		// report.GET("/purchase", r.Controller.V1().)

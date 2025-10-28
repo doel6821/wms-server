@@ -5,6 +5,7 @@ import (
 )
 
 type LoginRequest struct {
+	// Tenant   string `json:"tenant"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }

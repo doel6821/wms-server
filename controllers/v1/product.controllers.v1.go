@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -29,6 +30,7 @@ func (c *v1Controller) SaveProduct(ctx *gin.Context) {
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		res.Meta = helpers.GetMetaResponse(constants.RC_BADREQUEST)
+		fmt.Println("apakah disini error" , err)
 		ctx.JSON(http.StatusBadRequest, res)
 		return
 	}
@@ -58,6 +60,7 @@ func (c *v1Controller) ListProduct(ctx *gin.Context) {
 	var limit int
 	var name string
 	var code string
+	var supplier string
 	var err error
 	
 	if ctx.Query("page") == "" {
@@ -84,9 +87,10 @@ func (c *v1Controller) ListProduct(ctx *gin.Context) {
 
 	name = ctx.Query("name")
 	code = ctx.Query("code")
+	supplier = ctx.Query("supplier")
 	tenant := ctx.GetString("tenant")
-
-	res = c.Usecase.GetProductList(ctx, tenant, name, code, page, limit)
+	fmt.Println(tenant)
+	res = c.Usecase.GetProductList(ctx, tenant, name, code, supplier, page, limit)
 	c.Logs.WithFields(helpers.GettingResponseLog( ctx, name, res, time.Since(trxTime))).Info("Get Product List")
 	ctx.JSON(http.StatusOK, res)
 }

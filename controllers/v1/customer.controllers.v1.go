@@ -32,7 +32,7 @@ func (c *v1Controller) SaveCustomer(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, res)
 		return
 	}
-
+	req.Tenant = ctx.GetString("tenant")
 	res = c.Usecase.SaveCustomer(ctx, req)
 	c.Logs.WithFields(helpers.GettingResponseLog( ctx, req, res, time.Since(trxTime))).Info("Save Customer List")
 	ctx.JSON(http.StatusOK, res)

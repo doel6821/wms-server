@@ -22,7 +22,7 @@ import (
 func InitializeNewLogs() *log.Logger {
 	l := log.New()
 	l.SetFormatter(&log.JSONFormatter{
-		PrettyPrint: false,
+		PrettyPrint: true,
 	})
 	l.SetReportCaller(true)
 
@@ -65,7 +65,7 @@ func NewTraceIDHook(traceID string) log.Hook {
 
 // Fire ...
 func (hook *TraceIDHook) Fire(entry *log.Entry) error {
-	entry.Data["TRACE_ID"] = entry.Context.Value(constants.TRANSACTION_ID)
+	// entry.Data["TRACE_ID"] = entry.Context.Value(constants.TRANSACTION_ID)
 	entry.Data["SERVICE_NAME"] = constants.SERVICE_NAME
 	return nil
 }

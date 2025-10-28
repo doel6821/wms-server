@@ -30,7 +30,7 @@ func (d *postgreDatabase) GetCustomerList(ctx context.Context,tenant, name strin
 		query = query.Where("name ilike ?", "%"+name+"%")
 	}
 
-	err := query.Order("id asc").Limit(limit).Offset((page - 1) * limit).Find(&res).Limit(-1).Offset(0).Count(&total).Error
+	err := query.Order("id asc").Limit(limit).Offset((page - 1) * limit).Find(&res).Limit(-1).Offset(-1).Count(&total).Error
 
 	if err != nil {
 		d.Logs.WithContext(ctx).WithError(err).Error("Error get Customers list")
@@ -52,7 +52,7 @@ func (d *postgreDatabase) GetCustomerById(ctx context.Context, id int64) (data m
 }
 
 // GetCustomerByPhone ...
-func (d *postgreDatabase) GetCustomerByPhone(ctx context.Context, phone string) (data models.Customers, err error) {
+func (d *postgreDatabase) GetCustomerByPhone(ctx context.Context, phone, tenant string) (data models.Customers, err error) {
 	query := d.Db.WithContext(ctx)
 	
 	if err = query.Where("Phone = ?", phone).First(&data).Error; err != nil {

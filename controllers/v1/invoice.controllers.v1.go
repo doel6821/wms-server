@@ -8,7 +8,7 @@ import (
 	cModels "wms-server/controllers/v1/models"
 	"wms-server/helpers"
 	hModels "wms-server/helpers/models"
-
+	pModels "wms-server/databases/postgre/models"
 	"github.com/gin-gonic/gin"
 )
 
@@ -80,15 +80,20 @@ func (c *v1Controller) ListInvoice(ctx *gin.Context) {
 		}
 	}
 
-	customerId, err := strconv.Atoi(ctx.Query("customerId"))
-	if err != nil {
-		res.Meta = helpers.GetMetaResponse(constants.RC_BADREQUEST)
-		ctx.JSON(http.StatusBadRequest, res)
-		return	
+	customerIdStr := ctx.Query("customerId")
+	dueDate := ctx.Query("dueDate")
+	var customerId int
+	if customerIdStr != "" {
+		customerId, err = strconv.Atoi(customerIdStr)
+		if err != nil {
+			res.Meta = helpers.GetMetaResponse(constants.RC_BADREQUEST)
+			ctx.JSON(http.StatusBadRequest, res)
+			return	
+		}
 	}
 	tenant := ctx.GetString("tenant")
 
-	res = c.Usecase.GetInvoiceList(ctx, tenant, int64(customerId), page, limit)
+	res = c.Usecase.GetInvoiceList(ctx, tenant, int64(customerId), page, limit, dueDate)
 	c.Logs.WithFields(helpers.GettingResponseLog( ctx, customerId, res, time.Since(trxTime))).Info("Get Invoice List")
 	ctx.JSON(http.StatusOK, res)
 }
@@ -120,3 +125,31 @@ func (c *v1Controller) GetInvoiceDetailById(ctx *gin.Context) {
 	c.Logs.WithFields(helpers.GettingResponseLog( ctx, id, res, time.Since(trxTime))).Info("Get Invoice By ID")
 	ctx.JSON(http.StatusOK, res)
 }
+
+
+// @Summary Update Invoice Order
+// @Description Update Invoice Order
+// @ID UpdateInvoiceOrder
+// @Param body body pModels.InvoiceOrder true "request body"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} models.Response
+// @Failure 400 {object} models.Response
+// @Router /wms-server/v.1/invoice-order/ [put]
+func (c *v1Controller) UpdateInvoiceOrder(ctx *gin.Context) {
+	trxTime := time.Now()
+	var res hModels.Response
+	var req pModels.InvoiceOrder
+
+
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		res.Meta = helpers.GetMetaResponse(constants.RC_BADREQUEST)
+		ctx.JSON(http.StatusBadRequest, res)
+		return
+	}
+	tenant := ctx.GetString("tenant")
+	res = c.Usecase.UpdateInvoice(ctx,tenant, req)
+	c.Logs.WithFields(helpers.GettingResponseLog( ctx, req, res, time.Since(trxTime))).Info("Save InvoiceOrder List")
+	ctx.JSON(http.StatusOK, res)
+}
+

@@ -19,7 +19,7 @@ func (d *postgreDatabase) SaveProduct(ctx context.Context, data models.Product) 
 
 
 // GetList ...
-func (d *postgreDatabase) GetProductList(ctx context.Context, tenant, name, code string, page , limit int) ( []models.Product, int64, error) {
+func (d *postgreDatabase) GetProductList(ctx context.Context, name, tenant, code, supplier string, page , limit int) ( []models.Product, int64, error) {
 	query := d.Db.WithContext(ctx)
 	
 	var res []models.Product
@@ -34,7 +34,11 @@ func (d *postgreDatabase) GetProductList(ctx context.Context, tenant, name, code
 		query = query.Where("code = ?", code)
 	}
 
-	err := query.Order("id asc").Limit(limit).Offset((page - 1) * limit).Find(&res).Limit(-1).Offset(0).Count(&total).Error
+	if supplier != "" {
+		query = query.Where("supplier_id = " + supplier)
+	}
+
+	err := query.Preload("ProductLocations").Order("id asc").Limit(limit).Offset((page - 1) * limit).Find(&res).Limit(-1).Offset(-1).Count(&total).Error
 
 	if err != nil {
 		d.Logs.WithContext(ctx).WithError(err).Error("Error get Product list")
@@ -48,7 +52,7 @@ func (d *postgreDatabase) GetProductList(ctx context.Context, tenant, name, code
 func (d *postgreDatabase) GetProductById(ctx context.Context, id int64) (data models.Product, err error) {
 	query := d.Db.WithContext(ctx)
 	
-	if err = query.Preload("ProductLocation").First(&data, id).Error; err != nil {
+	if err = query.Preload("ProductLocations").Preload("Supplier").Preload("Demands").First(&data, id).Error; err != nil {
 		d.Logs.WithContext(ctx).WithError(err).Error("Error getting existing data")
 		return data, err
 	}

@@ -9,5 +9,5 @@ type ProductLocation struct {
 }
 
 func (c *ProductLocation) TableName() string {
-	return "product_location"
+	return "product_locations"
 }

@@ -11,6 +11,7 @@ const (
 	RC_EXPIRED_TOKEN             = "TokenExpired"
 	RC_INVALID_MERCHANT          = "invalidMerchant"
 	RC_GENERAL_ERROR             = "general"
+	RC_NOT_FOUND                 = "notFound"
 	RC_INVALID_EMAIL_OR_PASSWORD = "invalidEmailOrPassword"
 	RC_EMAIL_ALREADY_USED        = "emailAlreadyUsed"
 	RC_STORE_NAME_ALREADY_USED   = "storeNameAlreadyUsed"

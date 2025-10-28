@@ -8,7 +8,11 @@ type CheckServiceReq struct {
 	Method      string
 }
 
-// ResponseMessage ..
+// HealthCheckData represents health check response data
+type HealthCheckData []DataHealthCheck
+
+// ResponseMessage maintains backward compatibility but follows standard pattern
+// Consider using hModels.Response with HealthCheckData in Data field instead
 type ResponseMessage struct {
 	ResponseCode int               `json:"rc"`
 	Message      string            `json:"message"`

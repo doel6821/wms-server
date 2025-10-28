@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -39,13 +40,13 @@ func (c *v1Controller) SavePackingOrder(ctx *gin.Context) {
 }
 
 
-// @Summary Get List Sales Order
-// @Description Get List Sales Order 
+// @Summary Get List Packing Order
+// @Description Get List Packing Order 
 // @ID GetListPackingOrder
 // @Param Authorization header string true "Bearer"
 // @Param page query int true "Page"
 // @Param limit query int true "Limit"
-// @Param name query string false "Name"
+// @Param name query int true "CustomerId"
 // @Accept  json
 // @Produce  json
 // @Success 200 {object} models.Response
@@ -63,6 +64,7 @@ func (c *v1Controller) ListPackingOrder(ctx *gin.Context) {
 	} else {
 		page, err = strconv.Atoi(ctx.Query("page"))
 		if err != nil {
+			fmt.Println("error1", err)
 			res.Meta = helpers.GetMetaResponse(constants.RC_BADREQUEST)
 			ctx.JSON(http.StatusBadRequest, res)
 			return	
@@ -74,17 +76,22 @@ func (c *v1Controller) ListPackingOrder(ctx *gin.Context) {
 	} else {
 		limit, err = strconv.Atoi(ctx.Query("limit"))
 		if err != nil {
+			fmt.Println("error2", err)
 			res.Meta = helpers.GetMetaResponse(constants.RC_BADREQUEST)
 			ctx.JSON(http.StatusBadRequest, res)
 			return	
 		}
 	}
-
-	customerId, err := strconv.Atoi(ctx.Query("customerId"))
-	if err != nil {
-		res.Meta = helpers.GetMetaResponse(constants.RC_BADREQUEST)
-		ctx.JSON(http.StatusBadRequest, res)
-		return	
+	customer := ctx.Query("customerId")
+	customerId := 0
+	if customer != "" {
+		customerId, err = strconv.Atoi(ctx.Query("customerId"))
+		if err != nil {
+			fmt.Println("error3", err)
+			res.Meta = helpers.GetMetaResponse(constants.RC_BADREQUEST)
+			ctx.JSON(http.StatusBadRequest, res)
+			return	
+		}
 	}
 	tenant := ctx.GetString("tenant")
 
@@ -117,6 +124,35 @@ func (c *v1Controller) GetPackingOrderDetailById(ctx *gin.Context) {
 	}
 
 	res = c.Usecase.GetPackingOrderDetailById(ctx, int64(id))
+	c.Logs.WithFields(helpers.GettingResponseLog( ctx, id, res, time.Since(trxTime))).Info("Get PackingOrder By ID")
+	ctx.JSON(http.StatusOK, res)
+}
+
+
+// @Summary Get PackingOrderItem By ProductID
+// @Description Get PackingOrderItem By ProductID
+// @ID GetPackingOrderItemByProductID
+// @Param Authorization header string true "Bearer"
+// @Param id path int true "ID of Product"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} models.Response
+// @Failure 400 {object} models.Response
+// @Router /wms-server/v.1/packing-order-item/{id} [get]
+func (c *v1Controller) GetPackingOrderItemByProductId(ctx *gin.Context) {
+	trxTime := time.Now()
+	var res hModels.Response
+	var id int
+	var err error
+	
+	id, err = strconv.Atoi(ctx.Param("id"))
+	if err != nil {
+		res.Meta = helpers.GetMetaResponse(constants.RC_BADREQUEST)
+		ctx.JSON(http.StatusBadRequest, res)
+		return	
+	}
+
+	res = c.Usecase.GetPackingOrderListByProductId(ctx, int64(id))
 	c.Logs.WithFields(helpers.GettingResponseLog( ctx, id, res, time.Since(trxTime))).Info("Get PackingOrder By ID")
 	ctx.JSON(http.StatusOK, res)
 }

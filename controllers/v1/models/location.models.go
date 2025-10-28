@@ -5,3 +5,10 @@ type RegisterLocationRequest struct {
 	Code string `json:"code"`
 	Name string `json:"name"`
 }
+
+type LocationQueryParams struct {
+	Name  string `form:"name"`
+	Code  string `form:"code"`
+	Page  int    `form:"page"`
+	Limit int    `form:"limit"`
+}

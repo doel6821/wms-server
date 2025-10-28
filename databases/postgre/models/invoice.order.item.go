@@ -11,7 +11,7 @@ type InvoiceOrderItem struct {
 }
 
 func (c *InvoiceOrderItem) TableName() string {
-	return "invoice_order_item"
+	return "invoice_order_items"
 }
 
 type InvoiceOrderItemRes struct {

@@ -15,9 +15,12 @@ type Product struct {
 	StockOnReceive   int               `json:"stockOnReceive"`
 	LeadTimeDays     int               `json:"leadTimeDays"`
 	Tenant           string            `json:"tenant"`
+	SupplierId       int64             `json:"supplierId"`
+	Supplier         Supplier          `json:"supplier" gorm:"foreignKey:ID;references:supplier_id"`
 	ProductLocations []ProductLocation `json:"productLocations" gorm:"Foreignkey:product_id;association_foreignkey:ID;"`
+	Demands          Demand            `json:"demands" gorm:"Foreignkey:product_id;association_foreignkey:ID;"`
 }
 
 func (c *Product) TableName() string {
-	return "product"
+	return "products"
 }

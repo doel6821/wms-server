@@ -44,4 +44,16 @@ func (d *postgreDatabase) GetPackingOrderItemById(ctx context.Context, id int64)
 	return data, nil
 }
 
+// GetPackingOrderByProductId ...
+func (d *postgreDatabase) GetPackingOrderItemByProductId(ctx context.Context, productId int64) (data []models.PackingOrderItem, err error) {
+	query := d.Db.WithContext(ctx)
+
+    err = query.Where("product_id = ? ", productId).Preload("Customer").Preload("Product").First(&data).Error
+	if err != nil {
+		d.Logs.WithContext(ctx).WithError(err).Error("Error getting existing data")
+		return data, err
+	}
+	return data, nil
+}
+
 

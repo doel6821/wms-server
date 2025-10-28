@@ -51,7 +51,7 @@ func init() {
 }
 
 // HTTPGet func
-func HTTPGet(url string, header http.Header, to string) (gorequest.Response, []byte, error) {
+func HTTPGet(url string, header map[string]string, to string) (gorequest.Response, []byte, error) {
 	request := gorequest.New()
 	request.SetDebug(httpEnv.DebugClient)
 	timeout, err := time.ParseDuration(to)
@@ -82,7 +82,7 @@ func HTTPPost(url string, jsondata interface{}, to string) (gorequest.Response, 
 		request.TLSClientConfig(&tls.Config{InsecureSkipVerify: true})
 	}
 	reqagent := request.Post(url)
-	reqagent.Header.Set("Content-Type", "application/json")
+	reqagent.Header = map[string]string{"Content-Type": "application/json"}
 	resp, body, errs := reqagent.
 		Send(jsondata).
 		Timeout(timeout).
@@ -95,7 +95,7 @@ func HTTPPost(url string, jsondata interface{}, to string) (gorequest.Response, 
 }
 
 // HTTPPostWithHeader func
-func HTTPPostWithHeader(url string, jsondata interface{}, header http.Header, to string) (gorequest.Response, []byte, error) {
+func HTTPPostWithHeader(url string, jsondata interface{}, header map[string]string, to string) (gorequest.Response, []byte, error) {
 	request := gorequest.New()
 	request.SetDebug(httpEnv.DebugClient)
 	timeout, err := time.ParseDuration(to)
@@ -116,7 +116,7 @@ func HTTPPostWithHeader(url string, jsondata interface{}, header http.Header, to
 }
 
 // HTTPPostFormWithHeader func
-func HTTPPostFormWithHeader(url string, jsondata interface{}, header http.Header, to string) (gorequest.Response, []byte, error) {
+func HTTPPostFormWithHeader(url string, jsondata interface{}, header map[string]string, to string) (gorequest.Response, []byte, error) {
 	request := gorequest.New()
 	request.SetDebug(httpEnv.DebugClient)
 	timeout, err := time.ParseDuration(to)
@@ -138,7 +138,7 @@ func HTTPPostFormWithHeader(url string, jsondata interface{}, header http.Header
 }
 
 // HTTPPutWithHeader func
-func HTTPPutWithHeader(url string, jsondata interface{}, header http.Header, to string) (gorequest.Response, []byte, error) {
+func HTTPPutWithHeader(url string, jsondata interface{}, header map[string]string, to string) (gorequest.Response, []byte, error) {
 	request := gorequest.New()
 	request.SetDebug(httpEnv.DebugClient)
 	timeout, err := time.ParseDuration(to)
@@ -162,7 +162,7 @@ func HTTPPutWithHeader(url string, jsondata interface{}, header http.Header, to 
 }
 
 // HTTPDeleteWithHeader func
-func HTTPDeleteWithHeader(url string, jsondata interface{}, header http.Header, to string) (gorequest.Response, []byte, error) {
+func HTTPDeleteWithHeader(url string, jsondata interface{}, header map[string]string, to string) (gorequest.Response, []byte, error) {
 	request := gorequest.New()
 	request.SetDebug(httpEnv.DebugClient)
 	timeout, err := time.ParseDuration(to)
@@ -186,10 +186,10 @@ func HTTPDeleteWithHeader(url string, jsondata interface{}, header http.Header, 
 }
 
 // SendHTTPRequest ..
-func SendHTTPRequest(ctx context.Context, method, url string, header http.Header, body interface{}, timeout string, logs *logrus.Logger) (response gorequest.Response, data []byte, err error) {
+func SendHTTPRequest(ctx context.Context, method, url string, header map[string]string, body interface{}, timeout string, logs *logrus.Logger) (response gorequest.Response, data []byte, err error) {
 	start := time.Now()
 
-	header.Add("X-Trace-ID", ctx.Value(constants.TRANSACTION_ID).(string))
+	header["X-Trace-ID"] = ctx.Value(constants.TRANSACTION_ID).(string)
 
 	switch method {
 	case HTTPMethodGet:

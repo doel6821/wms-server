@@ -11,17 +11,18 @@ import (
 
 func (u *usecase) SaveProduct(ctx context.Context, tenant string, req cModels.RegisterProductRequest) hModels.Response {
 	res := hModels.Response{
-		Meta: helpers.GetNewMetaResponse("en", constants.RC_GENERAL_ERROR),
+		Meta: helpers.GetMetaResponse(constants.RC_GENERAL_ERROR),
 	}
 
 	var product pModels.Product
 	var err error
 	if req.ID == 0 {
 		product, err = u.DB.GetPostgre().GetProductByCode(ctx, tenant, req.Code)
-		if err != nil && err.Error() != "record not found" {
+		if err != nil && err.Error() == "record not found" {
 
 			product.Name = req.Name
 			product.Code = req.Code
+			product.SupplierId = req.SupplierId
 			product.HETPrice = req.HETPrice
 			product.CostPrice = req.CostPrice
 			product.AvgPrice = req.AvgPrice
@@ -36,12 +37,12 @@ func (u *usecase) SaveProduct(ctx context.Context, tenant string, req cModels.Re
 			err = u.DB.GetPostgre().SaveProduct(ctx, product)
 			if err != nil {
 				u.Logs.WithContext(ctx).WithError(err).Error("failed save Product")
-				res.Meta = helpers.GetNewMetaResponse("en", constants.RC_GENERAL_ERROR)
+				res.Meta = helpers.GetMetaResponse(constants.RC_GENERAL_ERROR)
 				return res
 			}
 		} else if product.ID != 0 {
 			u.Logs.WithContext(ctx).WithError(err).Error("phone number already used")
-			res.Meta = helpers.GetNewMetaResponse("en", constants.RC_PHONE_NUMBER_ALREADY_USED)
+			res.Meta = helpers.GetMetaResponse(constants.RC_PHONE_NUMBER_ALREADY_USED)
 			return res
 		}
 	} else {
@@ -49,6 +50,7 @@ func (u *usecase) SaveProduct(ctx context.Context, tenant string, req cModels.Re
 			ID:              req.ID,
 			Name:            req.Name,
 			Code:            req.Code,
+			SupplierId:      req.SupplierId,
 			HETPrice:        req.HETPrice,
 			CostPrice:       req.CostPrice,
 			AvgPrice:        req.AvgPrice,
@@ -64,60 +66,60 @@ func (u *usecase) SaveProduct(ctx context.Context, tenant string, req cModels.Re
 		err = u.DB.GetPostgre().SaveProduct(ctx, product)
 		if err != nil {
 			u.Logs.WithContext(ctx).WithError(err).Error("failed save Product")
-			res.Meta = helpers.GetNewMetaResponse("en", constants.RC_GENERAL_ERROR)
+			res.Meta = helpers.GetMetaResponse(constants.RC_GENERAL_ERROR)
 			return res
 		}
 	}
 
-	res.Meta = helpers.GetNewMetaResponse("en", constants.RC_SUCCESS)
+	res.Meta = helpers.GetMetaResponse(constants.RC_SUCCESS)
 	return res
 }
 
-func (u *usecase) GetProductList(ctx context.Context,tenant, name, code string, page, limit int) hModels.Response {
+func (u *usecase) GetProductList(ctx context.Context, tenant, name, code, supplier string, page, limit int) hModels.Response {
 	res := hModels.Response{
-		Meta: helpers.GetNewMetaResponse("en", constants.RC_GENERAL_ERROR),
+		Meta: helpers.GetMetaResponse(constants.RC_GENERAL_ERROR),
 	}
 
-	listProduct, total, err := u.DB.GetPostgre().GetProductList(ctx, name,tenant, code, page, limit)
+	listProduct, total, err := u.DB.GetPostgre().GetProductList(ctx, name, tenant, code, supplier, page, limit)
 	if err != nil {
 		u.Logs.WithContext(ctx).WithError(err).Error("failed get Product list")
-		res.Meta = helpers.GetNewMetaResponse("en", constants.RC_GENERAL_ERROR)
+		res.Meta = helpers.GetMetaResponse(constants.RC_GENERAL_ERROR)
 		return res
 	}
 	res.Data = listProduct
 	res.Count = total
-	res.Meta = helpers.GetNewMetaResponse("en", constants.RC_SUCCESS)
+	res.Meta = helpers.GetMetaResponse(constants.RC_SUCCESS)
 	return res
 }
 
 func (u *usecase) GetProductId(ctx context.Context, id int64) hModels.Response {
 	res := hModels.Response{
-		Meta: helpers.GetNewMetaResponse("en", constants.RC_GENERAL_ERROR),
+		Meta: helpers.GetMetaResponse(constants.RC_GENERAL_ERROR),
 	}
 
 	Product, err := u.DB.GetPostgre().GetProductById(ctx, id)
-	if err != nil && err.Error() != "record not found" {
+	if err != nil {
 		u.Logs.WithContext(ctx).WithError(err).Error("failed get Product")
-		res.Meta = helpers.GetNewMetaResponse("en", constants.RC_GENERAL_ERROR)
+		res.Meta = helpers.GetMetaResponse(constants.RC_GENERAL_ERROR)
 		return res
 	}
 	res.Data = Product
-	res.Meta = helpers.GetNewMetaResponse("en", constants.RC_SUCCESS)
+	res.Meta = helpers.GetMetaResponse(constants.RC_SUCCESS)
 	return res
 }
 
 func (u *usecase) DeleteProductId(ctx context.Context, id int64) hModels.Response {
 	res := hModels.Response{
-		Meta: helpers.GetNewMetaResponse("en", constants.RC_GENERAL_ERROR),
+		Meta: helpers.GetMetaResponse(constants.RC_GENERAL_ERROR),
 	}
 
 	err := u.DB.GetPostgre().DeleteProductById(ctx, id)
-	if err != nil && err.Error() != "record not found" {
+	if err != nil {
 		u.Logs.WithContext(ctx).WithError(err).Error("failed get Product")
-		res.Meta = helpers.GetNewMetaResponse("en", constants.RC_GENERAL_ERROR)
+		res.Meta = helpers.GetMetaResponse(constants.RC_GENERAL_ERROR)
 		return res
 	}
 
-	res.Meta = helpers.GetNewMetaResponse("en", constants.RC_SUCCESS)
+	res.Meta = helpers.GetMetaResponse(constants.RC_SUCCESS)
 	return res
 }

@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -28,6 +29,7 @@ func (c *v1Controller) SaveSalesOrder(ctx *gin.Context) {
 
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
+		fmt.Println(err)
 		res.Meta = helpers.GetMetaResponse(constants.RC_BADREQUEST)
 		ctx.JSON(http.StatusBadRequest, res)
 		return
@@ -80,15 +82,20 @@ func (c *v1Controller) ListSalesOrder(ctx *gin.Context) {
 		}
 	}
 
-	customerId, err := strconv.Atoi(ctx.Query("customerId"))
-	if err != nil {
-		res.Meta = helpers.GetMetaResponse(constants.RC_BADREQUEST)
-		ctx.JSON(http.StatusBadRequest, res)
-		return	
+	customerIdStr := ctx.Query("customerId")
+	allocation := ctx.Query("allocation")
+	var customerId int
+	if customerIdStr != "" {
+		customerId, err = strconv.Atoi(customerIdStr)
+		if err != nil {
+			res.Meta = helpers.GetMetaResponse(constants.RC_BADREQUEST)
+			ctx.JSON(http.StatusBadRequest, res)
+			return	
+		}
 	}
 	tenant := ctx.GetString("tenant")
 
-	res = c.Usecase.GetSalesOrderList(ctx, tenant, int64(customerId), page, limit)
+	res = c.Usecase.GetSalesOrderList(ctx, tenant, allocation, int64(customerId), page, limit)
 	c.Logs.WithFields(helpers.GettingResponseLog( ctx, customerId, res, time.Since(trxTime))).Info("Get SalesOrder List")
 	ctx.JSON(http.StatusOK, res)
 }
@@ -118,5 +125,37 @@ func (c *v1Controller) GetSalesOrderById(ctx *gin.Context) {
 
 	res = c.Usecase.GetSalesOrderDetailById(ctx, int64(id))
 	c.Logs.WithFields(helpers.GettingResponseLog( ctx, id, res, time.Since(trxTime))).Info("Get SalesOrder By ID")
+	ctx.JSON(http.StatusOK, res)
+}
+
+
+// @Summary Get SalesOrderItem By ID
+// @Description Get SalesOrderItem By ID
+// @ID GetSalesOrderItemByID
+// @Param Authorization header string true "Bearer"
+// @Param productId query int true "productId"
+// @Param type query int true "type"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} models.Response
+// @Failure 400 {object} models.Response
+// @Router /wms-server/v.1/sales-order-item [get]
+func (c *v1Controller) GetSalesOrderItemByProductId(ctx *gin.Context) {
+	trxTime := time.Now()
+	var res hModels.Response
+	var err error
+
+	productIdStr := ctx.Query("productId")
+	tipe := ctx.Query("tipe")
+	
+	productId, err := strconv.Atoi(productIdStr)
+	if err != nil {
+		res.Meta = helpers.GetMetaResponse(constants.RC_BADREQUEST)
+		ctx.JSON(http.StatusBadRequest, res)
+		return	
+	}
+
+	res = c.Usecase.GetSalesOrderItemByProductId(ctx, int64(productId), tipe)
+	c.Logs.WithFields(helpers.GettingResponseLog( ctx, productId, res, time.Since(trxTime))).Info("Get SalesOrder By ID")
 	ctx.JSON(http.StatusOK, res)
 }

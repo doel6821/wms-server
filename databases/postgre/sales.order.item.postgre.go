@@ -49,7 +49,7 @@ func (d *postgreDatabase) GetSalesOrderItemById(ctx context.Context, id int64) (
 func (d *postgreDatabase) GetSalesOrderItemByAllocation(ctx context.Context, ids []int) (data []models.SalesOrderItem, err error) {
 	query := d.Db.WithContext(ctx)
 	
-	if err = query.Where("id in (" + helpers.JoinInts(ids, ",") + ") anda allocation_order_quantity > 0").Find(&data).Error; err != nil {
+	if err = query.Where("id in (" + helpers.JoinInts(ids, ",") + ") and allocation_order_qty > 0").Find(&data).Error; err != nil {
 		d.Logs.WithContext(ctx).WithError(err).Error("Error getting existing data")
 		return data, err
 	}
@@ -67,5 +67,41 @@ func (d *postgreDatabase) GetSalesOrderItemBySalesOrderId(ctx context.Context, s
 	}
 	return data, nil
 }
+
+
+// GetSalesOrderItemAllocationByProductId ...
+func (d *postgreDatabase) GetSalesOrderItemAllocationByProductId(ctx context.Context, productId int64) (data []models.SalesOrderItem, err error) {
+	query := d.Db.WithContext(ctx)
+	
+	if err = query.Where("product_id = ? and allocation_order_qty > 0", productId).Preload("Customer").Preload("Product").Find(&data).Error; err != nil {
+		d.Logs.WithContext(ctx).WithError(err).Error("Error getting existing data")
+		return data, err
+	}
+	return data, nil
+}
+
+// GetSalesOrderItemBackOrderByProductId ...
+func (d *postgreDatabase) GetSalesOrderItemBackOrderByProductId(ctx context.Context, productId int64) (data []models.SalesOrderItem, err error) {
+	query := d.Db.WithContext(ctx)
+	
+	if err = query.Table("sales_order_items soi").Joins("left join sales_orders so on so.id = soi.sales_order_id").Where("product_id = ? and back_order_qty > 0", productId).Preload("Customer").Preload("Product").Order("so.order_date asc").Find(&data).Error; err != nil {
+		d.Logs.WithContext(ctx).WithError(err).Error("Error getting existing data")
+		return data, err
+	}
+	return data, nil
+}
+
+
+// GetSalesOrderItemOnPackingByProductId ...
+func (d *postgreDatabase) GetSalesOrderItemOnPackingByProductId(ctx context.Context, productId int64) (data []models.SalesOrderItem, err error) {
+	query := d.Db.WithContext(ctx)
+	
+	if err = query.Table("sales_order_items soi").Joins("left join sales_orders so on so.id = soi.sales_order_id").Where("product_id = ? and packing_order_qty > 0", productId).Preload("Customer").Preload("Product").Order("so.order_date ASC").Find(&data).Error; err != nil {
+		d.Logs.WithContext(ctx).WithError(err).Error("Error getting existing data")
+		return data, err
+	}
+	return data, nil
+}
+
 
 

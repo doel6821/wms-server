@@ -96,6 +96,14 @@
     }
   },
   {
+    "key": "notFound",
+    "content": {
+      "code": "400?08",
+      "title": "Error",
+      "message": "Data Not Found"
+    }
+  },
+  {
     "key": "general",
     "content": {
       "code": "500?00",

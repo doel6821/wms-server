@@ -12,25 +12,22 @@ import (
 
 func (u *usecase) CreateSalesOrder(ctx context.Context, tenant string, req cModels.SalesOrderRequest) hModels.Response {
 	res := hModels.Response{
-		Meta: helpers.GetNewMetaResponse("en", constants.RC_GENERAL_ERROR),
+		Meta: helpers.GetMetaResponse(constants.RC_GENERAL_ERROR),
 	}
 
 	cust, err := u.DB.GetPostgre().GetCustomerById(ctx, req.CustomerID)
-	if err != nil && err.Error() != "record not found" {
-		res.Meta = helpers.GetNewMetaResponse("en", constants.RC_GENERAL_ERROR)
-		return res
-	} else if cust.ID == 0 {
-		res.Meta = helpers.GetNewMetaResponse("en", constants.RC_GENERAL_ERROR) // custNotFound
+	if err != nil {
+		res.Meta = helpers.GetMetaResponse(constants.RC_GENERAL_ERROR)
 		return res
 	}
 
 	so := pModels.SalesOrder{
-		CustomerId : uint(req.CustomerID) ,
-		OrderDate  : time.Now() ,
-		Amount     : req.Amount ,
-		Discount   : req.Discount ,
-		Total      : req.TotalAmount ,
-		Tenant     : tenant ,
+		CustomerId: uint(req.CustomerID),
+		OrderDate:  time.Now(),
+		Amount:     req.Amount,
+		Discount:   int(cust.DiscountPercent),
+		Total:      req.TotalAmount,
+		Tenant:     tenant,
 	}
 
 	soItems := []pModels.SalesOrderItem{}
@@ -38,9 +35,9 @@ func (u *usecase) CreateSalesOrder(ctx context.Context, tenant string, req cMode
 	demands := []pModels.Demand{}
 	for _, v := range req.OrderItems {
 		// checkStock
-		product , err := u.DB.GetPostgre().GetProductById(ctx, int64(v.ProductId))
-		if err != nil && err.Error() != "record not found" {
-			res.Meta = helpers.GetNewMetaResponse("en", constants.RC_GENERAL_ERROR)
+		product, err := u.DB.GetPostgre().GetProductById(ctx, int64(v.ProductId))
+		if err != nil {
+			res.Meta = helpers.GetMetaResponse(constants.RC_GENERAL_ERROR)
 			return res
 		}
 
@@ -50,7 +47,7 @@ func (u *usecase) CreateSalesOrder(ctx context.Context, tenant string, req cMode
 		// update stock to allocation if ready stock to backOrder if no stock
 		if product.StockOnHand != 0 && product.StockOnHand > v.OrderQty {
 			allocation = v.OrderQty
-			
+
 		} else if product.StockOnHand != 0 && product.StockOnHand < v.OrderQty {
 			allocation = product.StockOnHand
 			backOrder = v.OrderQty - allocation
@@ -61,20 +58,21 @@ func (u *usecase) CreateSalesOrder(ctx context.Context, tenant string, req cMode
 		product.StockOnHand -= allocation
 		product.StockAllocation += allocation
 		product.StockBackOrder += backOrder
-		
+		orderItem.CustomerId = req.CustomerID
 		orderItem.ProductId = product.ID
+		orderItem.OrderQty = v.OrderQty
 		orderItem.Price = product.HETPrice
 		orderItem.AllocationOrderQty = allocation
 		orderItem.BackOrderQty = backOrder
-		orderItem.Total = orderItem.Price * float64(orderItem.AllocationOrderQty)
-		
+		orderItem.Total = orderItem.Price * float64(orderItem.OrderQty)
+
 		productItems = append(productItems, product)
 		soItems = append(soItems, orderItem)
 
 		// update demand
 		demand, err := u.DB.GetPostgre().GetDemandByProductId(ctx, int64(v.ProductId))
 		if err != nil && err.Error() != "record not found" {
-			res.Meta = helpers.GetNewMetaResponse("en", constants.RC_GENERAL_ERROR)
+			res.Meta = helpers.GetMetaResponse(constants.RC_GENERAL_ERROR)
 			return res
 		}
 		trxDate := time.Now().Format("2006-01")
@@ -105,47 +103,110 @@ func (u *usecase) CreateSalesOrder(ctx context.Context, tenant string, req cMode
 		demands = append(demands, demand)
 	}
 
-	
+	so.Items = soItems
+
 	err = u.DB.GetPostgre().TxSalesOrder(ctx, so, soItems, productItems, demands)
 	if err != nil {
 		return res
 	}
 
-	res.Meta = helpers.GetNewMetaResponse("en", constants.RC_SUCCESS)
+	res.Meta = helpers.GetMetaResponse(constants.RC_SUCCESS)
 	return res
 }
 
-func (u *usecase) GetSalesOrderList(ctx context.Context,tenant string, customerId int64, page, limit int) hModels.Response {
+func (u *usecase) GetSalesOrderList(ctx context.Context, tenant, allocation string, customerId int64, page, limit int) hModels.Response {
 	res := hModels.Response{
-		Meta: helpers.GetNewMetaResponse("en", constants.RC_GENERAL_ERROR),
+		Meta: helpers.GetMetaResponse(constants.RC_GENERAL_ERROR),
 	}
 
-	listSalesOrder, total, err := u.DB.GetPostgre().GetSalesOrderList(ctx, tenant, customerId, page, limit)
+	listSalesOrder, total, err := u.DB.GetPostgre().GetSalesOrderList(ctx, tenant, allocation, customerId, page, limit)
 	if err != nil {
 		u.Logs.WithContext(ctx).WithError(err).Error("failed get SalesOrder list")
-		res.Meta = helpers.GetNewMetaResponse("en", constants.RC_GENERAL_ERROR)
+		res.Meta = helpers.GetMetaResponse(constants.RC_GENERAL_ERROR)
 		return res
 	}
+
 	res.Data = listSalesOrder
 	res.Count = total
-	res.Meta = helpers.GetNewMetaResponse("en", constants.RC_SUCCESS)
+	res.Meta = helpers.GetMetaResponse(constants.RC_SUCCESS)
 	return res
 }
 
 func (u *usecase) GetSalesOrderDetailById(ctx context.Context, id int64) hModels.Response {
 	res := hModels.Response{
-		Meta: helpers.GetNewMetaResponse("en", constants.RC_GENERAL_ERROR),
+		Meta: helpers.GetMetaResponse(constants.RC_GENERAL_ERROR),
 	}
 
 	salesOrder, err := u.DB.GetPostgre().GetSalesOrderById(ctx, id)
-	if err != nil && err.Error() != "record not found" {
+	if err != nil {
 		u.Logs.WithContext(ctx).WithError(err).Error("failed get Product")
-		res.Meta = helpers.GetNewMetaResponse("en", constants.RC_GENERAL_ERROR)
+		res.Meta = helpers.GetMetaResponse(constants.RC_GENERAL_ERROR)
 		return res
 	}
 	res.Data = salesOrder
-	res.Meta = helpers.GetNewMetaResponse("en", constants.RC_SUCCESS)
+	res.Meta = helpers.GetMetaResponse(constants.RC_SUCCESS)
 	return res
 }
 
 
+func (u *usecase) GetSalesOrderItemByProductId(ctx context.Context, productId int64, tipe string) hModels.Response {
+
+	switch tipe {
+	case "Allocation":
+		return u.GetSalesOrderAllocationByProductId(ctx, productId)
+	case "BackOrder":
+		return u.GetSalesOrderBackOrderByProductId(ctx, productId)
+	case "OnPacking":
+		return u.GetSalesOrderOnPackingByProductId(ctx, productId)
+	}
+
+	return hModels.Response{}
+}
+
+func (u *usecase) GetSalesOrderAllocationByProductId(ctx context.Context, productId int64) hModels.Response {
+	res := hModels.Response{
+		Meta: helpers.GetMetaResponse(constants.RC_GENERAL_ERROR),
+	}
+
+	salesOrder, err := u.DB.GetPostgre().GetSalesOrderItemAllocationByProductId(ctx, productId)
+	if err != nil {
+		u.Logs.WithContext(ctx).WithError(err).Error("failed get Product")
+		res.Meta = helpers.GetMetaResponse(constants.RC_GENERAL_ERROR)
+		return res
+	}
+	res.Data = salesOrder
+	res.Meta = helpers.GetMetaResponse(constants.RC_SUCCESS)
+	return res
+}
+
+func (u *usecase) GetSalesOrderBackOrderByProductId(ctx context.Context, productId int64) hModels.Response {
+	res := hModels.Response{
+		Meta: helpers.GetMetaResponse(constants.RC_GENERAL_ERROR),
+	}
+
+	salesOrder, err := u.DB.GetPostgre().GetSalesOrderItemBackOrderByProductId(ctx, productId)
+	if err != nil {
+		u.Logs.WithContext(ctx).WithError(err).Error("failed get Product")
+		res.Meta = helpers.GetMetaResponse(constants.RC_GENERAL_ERROR)
+		return res
+	}
+	res.Data = salesOrder
+	res.Meta = helpers.GetMetaResponse(constants.RC_SUCCESS)
+	return res
+}
+
+func (u *usecase) GetSalesOrderOnPackingByProductId(ctx context.Context, productId int64) hModels.Response {
+	res := hModels.Response{
+		Meta: helpers.GetMetaResponse(constants.RC_GENERAL_ERROR),
+	}
+
+	salesOrder, err := u.DB.GetPostgre().GetSalesOrderItemOnPackingByProductId(ctx, productId)
+	if err != nil {
+		u.Logs.WithContext(ctx).WithError(err).Error("failed get Product")
+		res.Meta = helpers.GetMetaResponse(constants.RC_GENERAL_ERROR)
+		return res
+	}
+	res.Data = salesOrder
+	res.Meta = helpers.GetMetaResponse(constants.RC_SUCCESS)
+	return res
+}

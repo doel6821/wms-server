@@ -3,10 +3,11 @@ package postgre
 import (
 	"context"
 	"fmt"
+	"time"
+	cModels "wms-server/controllers/v1/models"
 	"wms-server/databases/postgre/models"
 	"wms-server/helpers"
 	uModels "wms-server/usecases/v1/models"
-	"time"
 
 	logs "github.com/sirupsen/logrus"
 	"gorm.io/driver/postgres"
@@ -24,64 +25,97 @@ type (
 	PostgreDatabase interface {
 		HealthCheck(ctx context.Context) uModels.DataHealthCheck
 		FindUser(ctx context.Context, email string) (models.User, error)
+		FindUserById(ctx context.Context, id int) (models.User, error)
 		FindTenant(ctx context.Context, tenant string) (models.User, error)
-		Save(ctx context.Context, user models.User)  error
+		Save(ctx context.Context, user models.User) error
+		GetUserList(ctx context.Context, tenant, email string, page, limit int) ([]models.User, int64, error)
 
-		SaveCustomers(ctx context.Context, data models.Customers) (error)
-		GetCustomerList(ctx context.Context, tenant, name string, page , limit int) ( []models.Customers, int64, error)
+		SaveCustomers(ctx context.Context, data models.Customers) error
+		GetCustomerList(ctx context.Context, tenant, name string, page, limit int) ([]models.Customers, int64, error)
 		GetCustomerById(ctx context.Context, id int64) (data models.Customers, err error)
-		GetCustomerByPhone(ctx context.Context, phone string) (data models.Customers, err error)
+		GetCustomerByPhone(ctx context.Context, phone, tenant string) (data models.Customers, err error)
 		DeleteCustomerById(ctx context.Context, id int64) (err error)
 
-		SaveProduct(ctx context.Context, data models.Product) (error)
-		GetProductList(ctx context.Context, tenant, name, code string, page , limit int) ( []models.Product, int64, error)
+		SaveSupplier(ctx context.Context, data models.Supplier) error
+		GetSupplierList(ctx context.Context, tenant, name string, page, limit int) ([]models.Supplier, int64, error)
+		GetSupplierById(ctx context.Context, id int64) (data models.Supplier, err error)
+		GetSupplierByPhone(ctx context.Context, phone, tenant string) (data models.Supplier, err error)
+		DeleteSupplierById(ctx context.Context, id int64) (err error)
+
+		SaveProduct(ctx context.Context, data models.Product) error
+		GetProductList(ctx context.Context, name, tenant, code, supplier string, page, limit int) ([]models.Product, int64, error)
 		GetProductById(ctx context.Context, id int64) (data models.Product, err error)
 		GetProductByCode(ctx context.Context, tenant, code string) (data models.Product, err error)
-		DeleteProductById(ctx context.Context, id int64)  error
+		DeleteProductById(ctx context.Context, id int64) error
 
-		SaveDemand(ctx context.Context, data []*models.Demand) (error)
+		SaveDemand(ctx context.Context, data []*models.Demand) error
 		GetDemandByProductId(ctx context.Context, productId int64) (data models.Demand, err error)
 
-		SaveLocation(ctx context.Context, data models.Location) (error)
-		GetLocationList(ctx context.Context, tenant string) ( []models.Location, error)
-		GetLocationByLocationCode(ctx context.Context,tenant, locationCode string) (data models.Location, err error)
-		DeleteLocationById(ctx context.Context, id int64)  error
+		SaveLocation(ctx context.Context, data models.Location) error
+		GetLocationList(ctx context.Context, tenant string, query cModels.LocationQueryParams) ([]models.Location, int64, error)
+		GetLocationByLocationCode(ctx context.Context, tenant, locationCode string) (data models.Location, err error)
+		GetLocationByLocationId(ctx context.Context, tenant string, id int64) (data models.Location, err error)
+		DeleteLocationById(ctx context.Context, id int64) error
 
-		SaveProductLocation(ctx context.Context, data []*models.ProductLocation) (error)
-		GetProductLocationByLocationCode(ctx context.Context,productId int64, locationCode string) (data models.ProductLocation, err error)
-		GetProductLocationByProductId(ctx context.Context,productId int64) (data []models.ProductLocation, err error)
-		
+		SaveProductLocation(ctx context.Context, data []*models.ProductLocation) error
+		GetProductLocationByLocationCode(ctx context.Context, productId int64, locationCode string) (data models.ProductLocation, err error)
+		GetProductLocationByProductId(ctx context.Context, productId int64) (data []models.ProductLocation, err error)
+
 		SaveSalesOrder(ctx context.Context, data models.SalesOrder) error
-		GetSalesOrderList(ctx context.Context, tenant string, customerId int64, page, limit int) ([]models.SalesOrder, int64, error)
-		GetSalesOrderById(ctx context.Context, id int64) (data models.SalesOrderResponse, err error)
+		GetSalesOrderList(ctx context.Context, tenant, allocation string, customerId int64, page, limit int) ([]models.SalesOrder, int64, error)
+		GetSalesOrderById(ctx context.Context, id int64) (data models.SalesOrder, err error)
+		GetSalesOrderItemAllocationByProductId(ctx context.Context, productId int64) (data []models.SalesOrderItem, err error)
+		GetSalesOrderItemBackOrderByProductId(ctx context.Context, productId int64) (data []models.SalesOrderItem, err error)
+		GetSalesOrderItemOnPackingByProductId(ctx context.Context, productId int64) (data []models.SalesOrderItem, err error)
 		TxSalesOrder(ctx context.Context, reqSalesOrder models.SalesOrder, reqSalesOrderItem []models.SalesOrderItem, reqProductItems []models.Product, reqDemand []models.Demand) error
 
-		SaveSalesOrderItem(ctx context.Context, data []*models.SalesOrderItem) (error)
-		GetSalesOrderItemList(ctx context.Context, SalesOrderId int64) ( []models.SalesOrderItem, error)
+		SavePurchaseOrder(ctx context.Context, data models.PurchaseOrder) error
+		GetPurchaseOrderList(ctx context.Context, tenant string, customerId int64, page, limit int) ([]models.PurchaseOrder, int64, error)
+		GetPurchaseOrderById(ctx context.Context, id int64) (data models.PurchaseOrder, err error)
+		TxPurchaseOrder(ctx context.Context, reqPurchaseOrder models.PurchaseOrder, reqPurchaseOrderItem []models.PurchaseOrderItem, reqProductItems []models.Product) error
+
+		SaveSalesOrderItem(ctx context.Context, data []*models.SalesOrderItem) error
+		GetSalesOrderItemList(ctx context.Context, SalesOrderId int64) ([]models.SalesOrderItem, error)
 		GetSalesOrderItemById(ctx context.Context, id int64) (data models.SalesOrderItem, err error)
 		GetSalesOrderItemBySalesOrderId(ctx context.Context, salesOrderId, productId int64) (data models.SalesOrderItem, err error)
 		GetSalesOrderItemByAllocation(ctx context.Context, ids []int) (data []models.SalesOrderItem, err error)
 
-		SavePackingOrder(ctx context.Context, data models.PackingOrder) (error)
-		GetPackingOrderList(ctx context.Context, tenant string, customerId int64, page , limit int) ( []models.PackingOrder, int64, error)
-		GetPackingOrderById(ctx context.Context, id int64) (data models.PackingOrderResponse, err error)
-		UpdateStatusPackingOrder(ctx context.Context, id int64, status string)  error
-		TxPackingOrder(ctx context.Context, reqPackingOrder models.PackingOrder, reqPackingOrderItem []models.PackingOrderItem , reqSalesOrderItems []models.SalesOrderItem, reqProducts []models.Product) error
+		SavePurchaseOrderItem(ctx context.Context, data []*models.PurchaseOrderItem) error
+		GetPurchaseOrderItemList(ctx context.Context, purchaseOrderId int64) ([]models.PurchaseOrderItem, error)
+		GetPurchaseOrderItemById(ctx context.Context, id int64) (data models.PurchaseOrderItem, err error)
+		GetPurchaseOrderItemByPurchaseOrderId(ctx context.Context, purchaseOrderId, productId int64) (data models.PurchaseOrderItem, err error)
+		GetPurchaseOrderItemByAllocation(ctx context.Context, ids []int) (data []models.PurchaseOrderItem, err error)
+		GetAvailableReceiveOrder(ctx context.Context, tenant string, supplierId, productId int64) (data []models.PurchaseOrderItem, err error)
 
-		SavePackingOrderItem(ctx context.Context, data []*models.PackingOrderItem) (error)
-		GetPackingOrderItemList(ctx context.Context, PackingOrderId int64) ( []models.PackingOrderItem, error)
-		GetPackingOrderItemById(ctx context.Context, id int64) (data models.PackingOrderItem, err error) 
-		UpdatePackingOrder(ctx context.Context, data models.PackingOrder)  error
+		SaveReceiveOrder(ctx context.Context, data models.ReceiveOrder) error
+		GetReceiveOrderItemByProductId(ctx context.Context, id int64) (data []models.ReceiveOrderItem, err error)
+		GetReceiveOrderList(ctx context.Context, tenant string, customerId int64, page, limit int, dueDate string) ([]models.ReceiveOrder, int64, error)
+		GetReceiveOrderById(ctx context.Context, id int64) (data models.ReceiveOrder, err error)
+		GetReceiveOrderByProductId(ctx context.Context, id int64) (data []models.ReceiveOrder, err error)
+		UpdateStatusReceiveOrder(ctx context.Context, id int64, status string) error
+		TxReceiveOrder(ctx context.Context, reqReceiveOrder models.ReceiveOrder, reqReceiveOrderItem []models.ReceiveOrderItem, reqPurchaseOrderItems []models.PurchaseOrderItem, reqProducts []models.Product) error
+		TxStockedOrder(ctx context.Context, reqReceiveOrder models.ReceiveOrder, reqPurchaseOrderItems []models.PurchaseOrderItem, reqProducts []models.Product, reqProductLocations []models.ProductLocation, reqReceiveOrderItems []models.ReceiveOrderItem, boSales []models.SalesOrderItem) error
 
-		SaveInvoiceOrder(ctx context.Context, data models.InvoiceOrder) (error)
-		GetInvoiceList(ctx context.Context, tenant string, customerId int64, page , limit int) ( []models.InvoiceOrder, int64, error)
+		SavePackingOrder(ctx context.Context, data models.PackingOrder) error
+		GetPackingOrderList(ctx context.Context, tenant string, customerId int64, page, limit int) ([]models.PackingOrder, int64, error)
+		GetPackingOrderById(ctx context.Context, id int64) (data models.PackingOrder, err error)
+		UpdateStatusPackingOrder(ctx context.Context, id int64, status string) error
+		TxPackingOrder(ctx context.Context, reqPackingOrder models.PackingOrder, reqPackingOrderItem []models.PackingOrderItem, reqSalesOrderItems []models.SalesOrderItem, reqProducts []models.Product) error
+
+		SavePackingOrderItem(ctx context.Context, data []*models.PackingOrderItem) error
+		GetPackingOrderItemList(ctx context.Context, PackingOrderId int64) ([]models.PackingOrderItem, error)
+		GetPackingOrderItemByProductId(ctx context.Context, productId int64) (data []models.PackingOrderItem, err error)
+		GetPackingOrderItemById(ctx context.Context, id int64) (data models.PackingOrderItem, err error)
+		UpdatePackingOrder(ctx context.Context, data models.PackingOrder) error
+
+		SaveInvoiceOrder(ctx context.Context, data models.InvoiceOrder) error
+		GetInvoiceList(ctx context.Context, tenant string, customerId int64, page, limit int, dueDate string) ([]models.InvoiceOrder, int64, error)
 		GetInvoiceOrderById(ctx context.Context, id int64) (data models.InvoiceOrderResponse, err error)
-		TxInvoiceOrder(ctx context.Context, reqInvoiceOrder models.InvoiceOrder, reqInvoiceOrderItem []models.InvoiceOrderItem, reqPackingOrder models.PackingOrder, reqSalesOrderItem []models.SalesOrderItem, products []models.Product, productLocations []models.ProductLocation ) error
-		
+		TxInvoiceOrder(ctx context.Context, reqInvoiceOrder models.InvoiceOrder, reqInvoiceOrderItem []models.InvoiceOrderItem, reqPackingOrder models.PackingOrder, reqSalesOrderItem []models.SalesOrderItem, products []models.Product, productLocations []models.ProductLocation) error
 
-		SaveInvoiceOrderItem(ctx context.Context, data []*models.InvoiceOrderItem) (error)
-		GetInvoiceOrderItemList(ctx context.Context, InvoiceOrderId int64) ( []models.InvoiceOrderItem, error)
-		GetInvoiceOrderItemById(ctx context.Context, id int64) (data models.InvoiceOrderItem, err error) 
+		SaveInvoiceOrderItem(ctx context.Context, data []*models.InvoiceOrderItem) error
+		GetInvoiceOrderItemList(ctx context.Context, InvoiceOrderId int64) ([]models.InvoiceOrderItem, error)
+		GetInvoiceOrderItemById(ctx context.Context, id int64) (data models.InvoiceOrderItem, err error)
 	}
 )
 

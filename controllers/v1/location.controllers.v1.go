@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -57,8 +58,18 @@ func (c *v1Controller) ListLocation(ctx *gin.Context) {
 	var name string
 	
 	tenant := ctx.GetString("tenant")
+
+	var query cModels.LocationQueryParams
+
+	// Bind query string ke struct
+	if err := ctx.ShouldBindQuery(&query); err != nil {
+		res.Meta = helpers.GetMetaResponse(constants.RC_BADREQUEST)
+		ctx.JSON(http.StatusBadRequest, res)
+		return
+	}
+	fmt.Println(query)
 	
-	res = c.Usecase.GetLocationList(ctx, tenant)
+	res = c.Usecase.GetLocationList(ctx, tenant, query)
 	c.Logs.WithFields(helpers.GettingResponseLog( ctx, name, res, time.Since(trxTime))).Info("Get Location List")
 	ctx.JSON(http.StatusOK, res)
 }
@@ -68,6 +79,34 @@ func (c *v1Controller) ListLocation(ctx *gin.Context) {
 // @ID GetLocationByID
 // @Param Authorization header string true "Bearer"
 // @Param id path int true "ID of Location"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} models.Response
+// @Failure 400 {object} models.Response
+// @Router /wms-server/v.1/Location/{id} [get]
+func (c *v1Controller) GetLocationById(ctx *gin.Context) {
+	trxTime := time.Now()
+	var res hModels.Response
+	
+	id := ctx.Param("id")
+	tenant := ctx.GetString("tenant")
+	idNumber, err := strconv.Atoi(id)
+	if err != nil {
+		res.Meta = helpers.GetMetaResponse(constants.RC_BADREQUEST)
+		ctx.JSON(http.StatusBadRequest, res)
+		return	
+	}
+	res = c.Usecase.GetLocationById(ctx,tenant, int64(idNumber))
+	c.Logs.WithFields(helpers.GettingResponseLog( ctx, tenant, res, time.Since(trxTime))).Info("Get Location By code")
+	ctx.JSON(http.StatusOK, res)
+}
+
+
+// @Summary Get Location By Code
+// @Description Get Location By Code
+// @ID GetLocationByCode
+// @Param Authorization header string true "Bearer"
+// @Param code path int true "Code of Location"
 // @Accept  json
 // @Produce  json
 // @Success 200 {object} models.Response

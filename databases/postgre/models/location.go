@@ -8,5 +8,5 @@ type Location struct {
 }
 
 func (c *Location) TableName() string {
-	return "location"
+	return "locations"
 }

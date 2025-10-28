@@ -30,10 +30,10 @@ func (d *postgreDatabase) GetPackingOrderList(ctx context.Context, tenant string
 
 	query = query.Where("tenant = ?", tenant)
 	if customerId != 0 {
-		query = query.Where("customer_id ?", customerId)
+		query = query.Where("customer_id = ?", customerId)
 	}
 
-	err := query.Order("id desc").Limit(limit).Offset((page - 1) * limit).Find(&res).Limit(-1).Offset(0).Count(&total).Error
+	err := query.Preload("Customer").Preload("Items").Order("id desc").Limit(limit).Offset((page - 1) * limit).Find(&res).Limit(-1).Offset(-1).Count(&total).Error
 
 	if err != nil {
 		d.Logs.WithContext(ctx).WithError(err).Error("Error get PackingOrder list")
@@ -44,11 +44,10 @@ func (d *postgreDatabase) GetPackingOrderList(ctx context.Context, tenant string
 }
 
 // GetPackingOrderById ...
-func (d *postgreDatabase) GetPackingOrderById(ctx context.Context, id int64) (data models.PackingOrderResponse, err error) {
+func (d *postgreDatabase) GetPackingOrderById(ctx context.Context, id int64) (data models.PackingOrder, err error) {
 	query := d.Db.WithContext(ctx)
 
-	var order models.PackingOrderResponse
-    err = query.Preload("PackingItems").First(&order, id).Error
+    err = query.Where("id = ? ", id).Preload("Customer").Preload("Items").Preload("Items.Product").First(&data).Error
 	if err != nil {
 		d.Logs.WithContext(ctx).WithError(err).Error("Error getting existing data")
 		return data, err
@@ -90,11 +89,6 @@ func (d *postgreDatabase) TxPackingOrder(ctx context.Context, reqPackingOrder mo
 	query.SavePoint(constants.START)
 
 	if err := d.TxSavePackingOrder(ctx ,query, reqPackingOrder); err != nil {
-		query.RollbackTo(constants.START)
-		return err
-	}
-
-	if err := d.TxSavePackingOrderItems(ctx ,query, reqPackingOrderItem); err != nil {
 		query.RollbackTo(constants.START)
 		return err
 	}
