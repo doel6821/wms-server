@@ -38,7 +38,7 @@ func (d *postgreDatabase) GetProductList(ctx context.Context, name, tenant, code
 		query = query.Where("supplier_id = " + supplier)
 	}
 
-	err := query.Preload("ProductLocations").Order("id asc").Limit(limit).Offset((page - 1) * limit).Find(&res).Limit(-1).Offset(-1).Count(&total).Error
+	err := query.Preload("ProductLocations").Preload("Supplier").Preload("Demands").Order("id asc").Limit(limit).Offset((page - 1) * limit).Find(&res).Limit(-1).Offset(-1).Count(&total).Error
 
 	if err != nil {
 		d.Logs.WithContext(ctx).WithError(err).Error("Error get Product list")
@@ -83,3 +83,23 @@ func (d *postgreDatabase) DeleteProductById(ctx context.Context, id int64)  erro
 	}
 	return nil
 }
+
+
+// GetTotal ...
+func (d *postgreDatabase) GetProductTotal(ctx context.Context, tenant string) ( models.ProductTotal,  error) {
+	query := d.Db.WithContext(ctx)
+	
+	
+	productTotal := models.ProductTotal{}
+	err := query.Raw(`select count(id) as total_product, sum(stock_on_hand) as on_hand, sum(stock_allocation) as allocation, 
+		sum(stock_back_order) as back_order, sum(stock_packing) as packing, sum(stock_on_purchase) as purchase, sum(stock_on_receive) as receive from products
+		`).Scan(&productTotal).Error
+
+	if err != nil {
+		d.Logs.WithContext(ctx).WithError(err).Error("Error get Product list")
+		return productTotal, err
+	}
+
+	return productTotal, nil
+}
+

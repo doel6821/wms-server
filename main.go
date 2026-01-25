@@ -14,6 +14,7 @@ import (
 	"wms-server/helpers"
 	"wms-server/routers"
 	"wms-server/scheduler"
+	"wms-server/host"
 	
 )
 
@@ -34,10 +35,13 @@ func main() {
 		// rds,
 		logger,
 	)
+
+	mailSmpt:=host.InitializeMailSmpt(logger)
 	
 	v1Usecase := v1Usecases.InitializeV1Usecase(
 		db,
 		logger,
+		mailSmpt,
 	)
 	v1Controller := v1Controllers.InitializeV1Controller(v1Usecase, logger)
 

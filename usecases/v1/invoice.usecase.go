@@ -32,19 +32,23 @@ func (u *usecase) CreateInvoice(ctx context.Context, tenant string, req cModels.
 	products := []pModels.Product{}
 	productLocations := []pModels.ProductLocation{}
 	salesOrderItems := []pModels.SalesOrderItem{}
+	amount := 0.0
+	totalAmount := 0.0
 
 	for _, v := range packDetail.Items {
 		// create Invoice order items
 		invoiceItem := pModels.InvoiceOrderItem{
-			ProductCode: v.ProductCode,
-			ProductName: v.ProductName,
-			Quantity:    v.PackingOrderQty,
-			Price:       v.Product.HETPrice,
-			Total:       float64(v.PackingOrderQty) * (v.Product.HETPrice * (1 - float64(customer.DiscountPercent/100))),
+			SalesOrderId: v.SalesOrderId,
+			ProductCode:  v.ProductCode,
+			ProductName:  v.ProductName,
+			Quantity:     v.PackingOrderQty,
+			Price:        v.Product.HETPrice,
+			Total:        float64(v.PackingOrderQty) * v.Product.HETPrice,
 		}
 
 		invoiceItems = append(invoiceItems, invoiceItem)
-
+		amount += v.Product.HETPrice
+		totalAmount += float64(v.PackingOrderQty) * (v.Product.HETPrice * (1 - (float64(customer.DiscountPercent) / 100)))
 		// update product deduct qtty on packing
 		product, err := u.DB.GetPostgre().GetProductById(ctx, v.ProductId)
 		if err != nil {
@@ -75,21 +79,21 @@ func (u *usecase) CreateInvoice(ctx context.Context, tenant string, req cModels.
 		salesOrderItems = append(salesOrderItems, salesOrderItem)
 	}
 
-	paymentStatus := "Lunas"
+	paymentStatus := "Belum Lunas"
 	dueDate := time.Now()
-	invoiceNumber := "INV/SO" + dueDate.Format("2006/01/02/150405")
-	if customer.TermOfPayment != "cash" {
-		lt, _ := strconv.Atoi(strings.Split(customer.TermOfPayment, " ")[0])
-		dueDate = dueDate.Add(time.Duration(lt*24) * time.Hour)
-		paymentStatus = "Belum Lunas"
-	}
+	invoiceNumber := "INV/SO/" + dueDate.Format("2006/01/02/150405")
+	
+	lt, _ := strconv.Atoi(strings.Split(customer.TermOfPayment, " ")[0])
+	dueDate = dueDate.Add(time.Duration(lt*24) * time.Hour)
 
 	inv := pModels.InvoiceOrder{
 		PackingOrderId: req.PackingOrderId,
-		InvoiceNumber: invoiceNumber,
+		InvoiceNumber:  invoiceNumber,
 		CustomerId:     customer.ID,
 		CustomerName:   customer.Name,
+		Amount:         amount,
 		Discount:       int(customer.DiscountPercent),
+		TotalAmount:    totalAmount,
 		InvoiceDate:    time.Now(),
 		Status:         constants.COMPLETE,
 		PaymentStatus:  paymentStatus,
@@ -119,12 +123,12 @@ func (u *usecase) CreateInvoice(ctx context.Context, tenant string, req cModels.
 	return res
 }
 
-func (u *usecase) GetInvoiceList(ctx context.Context, tenant string, customerId int64, page, limit int, dueDate string) hModels.Response {
+func (u *usecase) GetInvoiceList(ctx context.Context, tenant string, customerId int64, page, limit int, dueDate, startDate, endDate, paymentStatus string) hModels.Response {
 	res := hModels.Response{
 		Meta: helpers.GetMetaResponse(constants.RC_GENERAL_ERROR),
 	}
 
-	listInvoiceOrder, total, err := u.DB.GetPostgre().GetInvoiceList(ctx, tenant, customerId, page, limit, dueDate)
+	listInvoiceOrder, total, err := u.DB.GetPostgre().GetInvoiceList(ctx, tenant, customerId, page, limit, dueDate, startDate, endDate, paymentStatus)
 	if err != nil {
 		u.Logs.WithContext(ctx).WithError(err).Error("failed get InvoiceOrder list")
 		res.Meta = helpers.GetMetaResponse(constants.RC_GENERAL_ERROR)
@@ -141,13 +145,13 @@ func (u *usecase) GetInvoiceDetailById(ctx context.Context, id int64) hModels.Re
 		Meta: helpers.GetMetaResponse(constants.RC_GENERAL_ERROR),
 	}
 
-	InvoiceOrder, err := u.DB.GetPostgre().GetInvoiceOrderById(ctx, id)
+	invoiceOrder, err := u.DB.GetPostgre().GetInvoiceOrderById(ctx, id)
 	if err != nil {
 		u.Logs.WithContext(ctx).WithError(err).Error("failed get Invoice")
 		res.Meta = helpers.GetMetaResponse(constants.RC_GENERAL_ERROR)
 		return res
 	}
-	res.Data = InvoiceOrder
+	res.Data = invoiceOrder
 	res.Meta = helpers.GetMetaResponse(constants.RC_SUCCESS)
 	return res
 }
@@ -167,4 +171,3 @@ func (u *usecase) UpdateInvoice(ctx context.Context, tenant string, req pModels.
 	res.Meta = helpers.GetMetaResponse(constants.RC_SUCCESS)
 	return res
 }
-

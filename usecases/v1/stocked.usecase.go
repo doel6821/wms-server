@@ -2,8 +2,6 @@ package usecases
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
 	"wms-server/constants"
 	cModels "wms-server/controllers/v1/models"
 	pModels "wms-server/databases/postgre/models"
@@ -67,8 +65,7 @@ func (u *usecase) CreateStocked(ctx context.Context, tenant string, req cModels.
 		product.CostPrice = v.PurchasePrice
 		product.AvgPrice = avgCost
 		products = append(products, product)
-		bt,_ := json.Marshal(product)
-		fmt.Println(string(bt))
+		
 		// update product location deduct qtty
 		productLocation, err := u.DB.GetPostgre().GetProductLocationByLocationCode(ctx, v.ProductId, v.ProductLocation)
 		if err != nil {
@@ -83,10 +80,6 @@ func (u *usecase) CreateStocked(ctx context.Context, tenant string, req cModels.
 		}
 
 		productLocation.Qtty += v.ReceiveOrderQty
-
-		btl,_ := json.Marshal(productLocation)
-		fmt.Println(string(btl))
-
 		productLocations = append(productLocations, productLocation)
 
 		// update purchase order item

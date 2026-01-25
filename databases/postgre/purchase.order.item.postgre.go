@@ -87,3 +87,19 @@ func (d *postgreDatabase) GetAvailableReceiveOrder(ctx context.Context, tenant s
 	
 	return data, nil
 }
+
+
+func (d *postgreDatabase) GetPurchaseOrderTotal(ctx context.Context, tenant string, startDate, endDate string) (data models.PurchaseOrderItemTotal, err error) {
+	query := d.Db.WithContext(ctx)
+	
+	if err = query.Table("purchase_order_items poi").Select(`count(poi.product_id) as total_item, sum(poi.order_qty) as total_order_qty , 
+		sum(poi.receive_order_qty) as total_receive_qty, sum(poi.stocked_order_qty) as total_stocked_qty, sum(poi.total) as total_amount`).
+		Joins("left join purchase_orders po on po.id = poi.purchase_order_id").
+		Where("(po.order_date between ? and ? ) and po.tenant = ?", startDate, endDate,tenant).Find(&data).Error; err != nil {
+		d.Logs.WithContext(ctx).WithError(err).Error("Error getting existing data")
+		return data, err
+	}
+	
+	return data, nil
+}
+

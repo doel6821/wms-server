@@ -1,7 +1,6 @@
 package helpers
 
 import (
-	"fmt"
 	"time"
 	cModels "wms-server/controllers/v1/models"
 	pModels "wms-server/databases/postgre/models"
@@ -31,7 +30,6 @@ func GenerateToken(user pModels.User) (string, int64, error) {
 	// Sign and get the complete encoded token as a string using the secret
 	tokenString, err := token.SignedString(secretKey)
 	if err != nil {
-		fmt.Println("Error signing string : ", err)
 		return "", 0, err
 	}
 

@@ -82,6 +82,9 @@ func (c *v1Controller) ListInvoice(ctx *gin.Context) {
 
 	customerIdStr := ctx.Query("customerId")
 	dueDate := ctx.Query("dueDate")
+	startDate := ctx.Query("startDate")
+	endDate := ctx.Query("endDate")
+	paymentStatus := ctx.Query("paymentStatus")
 	var customerId int
 	if customerIdStr != "" {
 		customerId, err = strconv.Atoi(customerIdStr)
@@ -93,7 +96,7 @@ func (c *v1Controller) ListInvoice(ctx *gin.Context) {
 	}
 	tenant := ctx.GetString("tenant")
 
-	res = c.Usecase.GetInvoiceList(ctx, tenant, int64(customerId), page, limit, dueDate)
+	res = c.Usecase.GetInvoiceList(ctx, tenant, int64(customerId), page, limit, dueDate, startDate, endDate, paymentStatus)
 	c.Logs.WithFields(helpers.GettingResponseLog( ctx, customerId, res, time.Since(trxTime))).Info("Get Invoice List")
 	ctx.JSON(http.StatusOK, res)
 }

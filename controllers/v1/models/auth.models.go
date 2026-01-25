@@ -10,6 +10,13 @@ type LoginRequest struct {
 	Password string `json:"password"`
 }
 
+type ChangePasswordRequest struct {
+	// Tenant   string `json:"tenant"`
+	Email    string `json:"email"`
+	OldPassword string `json:"oldPassword"`
+	NewPassword string `json:"newPassword"`
+}
+
 type RegisterRequest struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`

@@ -19,11 +19,15 @@ type (
 		HealthCheck(ctx *gin.Context)
 		
 		Login(ctx *gin.Context)
+		ForgotPassword(ctx *gin.Context)
+		ChangePassword(ctx *gin.Context)
 		CekToken(ctx *gin.Context)
 		RegisterUser(ctx *gin.Context)
 		UpdateUser(ctx *gin.Context)
 		RegisterTenant(ctx *gin.Context)
 		ListUser(ctx *gin.Context)
+
+		GetDataDashboard(ctx *gin.Context)
 
 		SaveCustomer(ctx *gin.Context)
 		ListCustomer(ctx *gin.Context)
@@ -39,12 +43,19 @@ type (
 		ListProduct(ctx *gin.Context)
 		GetProductById(ctx *gin.Context)
 		DeleteProductById(ctx *gin.Context)
+		ProductTotal(ctx *gin.Context)
 
 		SaveLocation(ctx *gin.Context)
 		ListLocation(ctx *gin.Context)
 		GetLocationByCode(ctx *gin.Context)
 		GetLocationById(ctx *gin.Context)
 		DeleteLocationById(ctx *gin.Context)
+
+		SaveConfiguration(ctx *gin.Context)
+		ListConfiguration(ctx *gin.Context)
+		GetConfigurationByName(ctx *gin.Context)
+		GetConfigurationById(ctx *gin.Context)
+		DeleteConfigurationById(ctx *gin.Context)
 
 		SaveSalesOrder(ctx *gin.Context) 
 		ListSalesOrder(ctx *gin.Context) 
@@ -61,8 +72,14 @@ type (
 		GetInvoiceDetailById(ctx *gin.Context)
 		UpdateInvoiceOrder(ctx *gin.Context)
 
+		SaveAccountPayable(ctx *gin.Context)
+		ListAccountPayable(ctx *gin.Context)
+		SaveAccountReceivable(ctx *gin.Context)
+		ListAccountReceivable(ctx *gin.Context)
+
 		SavePurchaseOrder(ctx *gin.Context) 
 		ListPurchaseOrder(ctx *gin.Context) 
+		PurchaseOrderRecomendation(ctx *gin.Context) 
 		GetPurchaseOrderById(ctx *gin.Context)
 
 		GetAvailableReceive(ctx *gin.Context)

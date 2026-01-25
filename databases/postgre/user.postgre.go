@@ -2,10 +2,8 @@ package postgre
 
 import (
 	"context"
-	"fmt"
 	"strings"
 
-	// "fmt"
 	"wms-server/databases/postgre/models"
 )
 
@@ -68,7 +66,7 @@ func (d *postgreDatabase) GetUserList(ctx context.Context,tenant, email string, 
 	
 	var res []models.User
 	var total int64
-	fmt.Println("ini tenant ", tenant)
+	
 	query = query.Where("tenant = ?", tenant)
 	if email != "" {
 		query = query.Where("email = ?", strings.ToLower(email))

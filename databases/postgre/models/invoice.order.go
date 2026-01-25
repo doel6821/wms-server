@@ -16,6 +16,7 @@ type InvoiceOrder struct {
 	Status         string             `json:"status"`
 	DueDate        time.Time          `json:"dueDate"`
 	PaymentStatus  string             `json:"paymentStatus"`
+	PaymentDate    time.Time          `json:"paymentDate"`
 	Tenant         string             `json:"tenant"`
 	InvoiceItems   []InvoiceOrderItem `json:"invoiceItems" gorm:"Foreignkey:invoice_order_id;association_foreignkey:ID;"`
 }

@@ -44,7 +44,6 @@ func (u *usecase) CreatePackingOrder(ctx context.Context, tenant string, req cMo
 
 		if len(product.ProductLocations) > 0 {
 			if product.ProductLocations[0].Qtty >= v.AllocationOrderQty {
-				fmt.Println("masuk kondisi1 ", product.ProductLocations[0].Qtty)
 				packingItem := pModels.PackingOrderItem{
 					SalesOrderId:    v.SalesOrderId,
 					CustomerId:      req.CustomerID,
@@ -56,7 +55,6 @@ func (u *usecase) CreatePackingOrder(ctx context.Context, tenant string, req cMo
 				}
 				packingItems = append(packingItems, packingItem)
 			} else if product.ProductLocations[0].Qtty < v.AllocationOrderQty && product.ProductLocations[0].Qtty+product.ProductLocations[1].Qtty >= v.AllocationOrderQty {
-				fmt.Println("masuk kondisi2 ", product.ProductLocations[0].Qtty)
 				packingItem := pModels.PackingOrderItem{
 					SalesOrderId:    v.SalesOrderId,
 					CustomerId:      req.CustomerID,
@@ -80,7 +78,6 @@ func (u *usecase) CreatePackingOrder(ctx context.Context, tenant string, req cMo
 				packingItems = append(packingItems, packingItem)
 			}
 		} else {
-			fmt.Println("masuk kondisi3 ", product.ProductLocations[0].Qtty)
 			packingItem := pModels.PackingOrderItem{
 					SalesOrderId:    v.SalesOrderId,
 					CustomerId:      req.CustomerID,

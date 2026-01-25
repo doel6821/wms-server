@@ -103,5 +103,21 @@ func (d *postgreDatabase) GetSalesOrderItemOnPackingByProductId(ctx context.Cont
 	return data, nil
 }
 
+func (d *postgreDatabase) GetSalesOrderTotal(ctx context.Context, tenant string, startDate, endDate string) (data models.SalesOrderItemTotal, err error) {
+	query := d.Db.WithContext(ctx)
+	
+	if err = query.Table("sales_order_items soi").Select(`count(soi.product_id) as total_item, sum(soi.order_qty) as total_order_qty , 
+		sum(soi.allocation_order_qty) as total_allocation_qty, sum(soi.back_order_qty) as total_back_order_qty, sum(soi.packing_order_qty) as total_packing_order_qty,
+		sum(soi.invoice_order_qty) as total_invoice_order_qty, sum(soi.total) as total_amount`).
+		Joins("left join sales_orders so on so.id = soi.sales_order_id").
+		Where("(so.order_date between ? and ? ) and so.tenant = ?", startDate, endDate, tenant).Find(&data).Error; err != nil {
+		d.Logs.WithContext(ctx).WithError(err).Error("Error getting existing data")
+		return data, err
+	}
+	
+	return data, nil
+}
+
+
 
 

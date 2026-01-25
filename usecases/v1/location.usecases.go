@@ -2,7 +2,6 @@ package usecases
 
 import (
 	"context"
-	"fmt"
 	"strings"
 	"wms-server/constants"
 	cModels "wms-server/controllers/v1/models"
@@ -30,11 +29,13 @@ func (u *usecase) SaveLocation(ctx context.Context, tenant string, req cModels.R
 			if err != nil {
 				u.Logs.WithContext(ctx).WithError(err).Error("failed save Location")
 				res.Meta = helpers.GetMetaResponse(constants.RC_GENERAL_ERROR)
+				res.Meta.Message = "Gagal menyimpan data lokasi"
 				return res
 			}
 		} else if location.ID != 0 {
 			u.Logs.WithContext(ctx).WithError(err).Error("location code already exist")
 			res.Meta = helpers.GetMetaResponse(constants.RC_LOCATION_EXIST)
+			res.Meta.Message = "kode lokasi sudah digunakan"
 			return res
 		}
 	} else {
@@ -49,6 +50,7 @@ func (u *usecase) SaveLocation(ctx context.Context, tenant string, req cModels.R
 		if err != nil {
 			u.Logs.WithContext(ctx).WithError(err).Error("failed save Location")
 			res.Meta = helpers.GetMetaResponse(constants.RC_GENERAL_ERROR)
+			res.Meta.Message = "Gagal menyimpan data lokasi"
 			return res
 		}
 	}
@@ -86,7 +88,7 @@ func (u *usecase) GetLocationByCode(ctx context.Context, tenant, code string) hM
 		if err.Error() == "record not found" {
 			res.Meta = helpers.GetMetaResponse(constants.RC_NOT_FOUND)
 		}
-		fmt.Println(err.Error())
+		
 		return res
 	}
 	res.Data = location
@@ -106,7 +108,7 @@ func (u *usecase) GetLocationById(ctx context.Context, tenant string, id int64) 
 		if err.Error() == "record not found" {
 			res.Meta = helpers.GetMetaResponse(constants.RC_NOT_FOUND)
 		}
-		fmt.Println(err.Error())
+		
 		return res
 	}
 	res.Data = location

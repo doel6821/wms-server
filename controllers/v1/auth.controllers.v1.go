@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -118,7 +117,7 @@ func (c *v1Controller) CekToken(ctx *gin.Context) {
 
 		return secretKey, nil
 	})
-	fmt.Println("err :" ,err)
+	
 	v, _ := err.(*jwt.ValidationError)
 
 	if v != nil {
@@ -202,8 +201,7 @@ func (c *v1Controller) ListUser(ctx *gin.Context) {
 	} else {
 		page, err = strconv.Atoi(ctx.Query("page"))
 		if err != nil {
-			res.Meta = helpers.GetMetaResponse(constants.RC_BADREQUEST)
-			fmt.Println("apakah dr sini 1")
+			res.Meta = helpers.GetMetaResponse(constants.RC_BADREQUEST)			
 			ctx.JSON(http.StatusBadRequest, res)
 			return	
 		}
@@ -214,7 +212,6 @@ func (c *v1Controller) ListUser(ctx *gin.Context) {
 	} else {
 		limit, err = strconv.Atoi(ctx.Query("limit"))
 		if err != nil {
-			fmt.Println("apakah dr sini 2")
 			res.Meta = helpers.GetMetaResponse(constants.RC_BADREQUEST)
 			ctx.JSON(http.StatusBadRequest, res)
 			return	
@@ -223,8 +220,60 @@ func (c *v1Controller) ListUser(ctx *gin.Context) {
 
 	email = ctx.Query("email")
 	tenant := ctx.GetString("tenant")
-	fmt.Println(tenant, "=======>>>>")
 	res = c.Usecase.GetUserList(ctx, tenant, email, page, limit)
 	c.Logs.WithFields(helpers.GettingResponseLog( ctx, email, res, time.Since(trxTime))).Info("Get Customer List")
+	ctx.JSON(http.StatusOK, res)
+}
+
+// @Summary Authenticate - GenerateToken
+// @Description Authenticate 
+// @ID Authenticate
+// @Param body body cModels.LoginRequest true "request body"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} models.Response
+// @Failure 400 {object} models.Response
+// @Router /wms-server/v.1/forgot [post]
+func (c *v1Controller) ForgotPassword(ctx *gin.Context) {
+	trxTime := time.Now()
+	var res hModels.Response
+	var req cModels.LoginRequest
+
+
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		res.Meta = helpers.GetMetaResponse(constants.RC_BADREQUEST)
+		ctx.JSON(http.StatusBadRequest, res)
+		return
+	}
+
+	res = c.Usecase.ForgotPassword(ctx, req)
+	c.Logs.WithFields(helpers.GettingResponseLog( ctx, req, res, time.Since(trxTime))).Info("Login")
+	ctx.JSON(http.StatusOK, res)
+}
+
+
+// @Summary Authenticate - GenerateToken
+// @Description Authenticate 
+// @ID Authenticate
+// @Param body body cModels.LoginRequest true "request body"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} models.Response
+// @Failure 400 {object} models.Response
+// @Router /wms-server/v.1/change-password [post]
+func (c *v1Controller) ChangePassword(ctx *gin.Context) {
+	trxTime := time.Now()
+	var res hModels.Response
+	var req cModels.ChangePasswordRequest
+
+
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		res.Meta = helpers.GetMetaResponse(constants.RC_BADREQUEST)
+		ctx.JSON(http.StatusBadRequest, res)
+		return
+	}
+
+	res = c.Usecase.ChangePassword(ctx, req)
+	c.Logs.WithFields(helpers.GettingResponseLog( ctx, req, res, time.Since(trxTime))).Info("Login")
 	ctx.JSON(http.StatusOK, res)
 }

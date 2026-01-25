@@ -96,9 +96,17 @@
     }
   },
   {
-    "key": "notFound",
+    "key": "configExist",
     "content": {
       "code": "400?08",
+      "title": "Error",
+      "message": "Configuration already exist"
+    }
+  },
+  {
+    "key": "notFound",
+    "content": {
+      "code": "400?09",
       "title": "Error",
       "message": "Data Not Found"
     }

@@ -7,6 +7,7 @@ type ReceiveOrderItem struct {
 	ProductId       int64   `json:"productId"`
 	ProductCode     string  `json:"productCode"`
 	ProductName     string  `json:"productName"`
+	Price           float64 `json:"price"`
 	ProductLocation string  `json:"productLocation"`
 	ReceiveOrderQty int     `json:"receiveOrderQty"`
 	PurchasePrice   float64 `json:"purchasePrice"`

@@ -47,6 +47,7 @@ type (
 		GetProductById(ctx context.Context, id int64) (data models.Product, err error)
 		GetProductByCode(ctx context.Context, tenant, code string) (data models.Product, err error)
 		DeleteProductById(ctx context.Context, id int64) error
+		GetProductTotal(ctx context.Context, tenant string) ( models.ProductTotal,  error)
 
 		SaveDemand(ctx context.Context, data []*models.Demand) error
 		GetDemandByProductId(ctx context.Context, productId int64) (data models.Demand, err error)
@@ -56,6 +57,12 @@ type (
 		GetLocationByLocationCode(ctx context.Context, tenant, locationCode string) (data models.Location, err error)
 		GetLocationByLocationId(ctx context.Context, tenant string, id int64) (data models.Location, err error)
 		DeleteLocationById(ctx context.Context, id int64) error
+
+		SaveConfiguration(ctx context.Context, data models.Configuration) error
+		GetConfigurationList(ctx context.Context, tenant string, query cModels.ConfigurationQueryParams) ([]models.Configuration, int64, error)
+		GetConfigurationByConfigurationId(ctx context.Context, tenant string, id int64) (data models.Configuration, err error)
+		GetConfigurationByConfigurationName(ctx context.Context,tenant, ConfigurationName string) (data models.Configuration, err error)
+		DeleteConfigurationById(ctx context.Context, id int64) error
 
 		SaveProductLocation(ctx context.Context, data []*models.ProductLocation) error
 		GetProductLocationByLocationCode(ctx context.Context, productId int64, locationCode string) (data models.ProductLocation, err error)
@@ -79,6 +86,7 @@ type (
 		GetSalesOrderItemById(ctx context.Context, id int64) (data models.SalesOrderItem, err error)
 		GetSalesOrderItemBySalesOrderId(ctx context.Context, salesOrderId, productId int64) (data models.SalesOrderItem, err error)
 		GetSalesOrderItemByAllocation(ctx context.Context, ids []int) (data []models.SalesOrderItem, err error)
+		GetSalesOrderTotal(ctx context.Context, tenant string, startDate, endDate string) (data models.SalesOrderItemTotal, err error)
 
 		SavePurchaseOrderItem(ctx context.Context, data []*models.PurchaseOrderItem) error
 		GetPurchaseOrderItemList(ctx context.Context, purchaseOrderId int64) ([]models.PurchaseOrderItem, error)
@@ -86,13 +94,15 @@ type (
 		GetPurchaseOrderItemByPurchaseOrderId(ctx context.Context, purchaseOrderId, productId int64) (data models.PurchaseOrderItem, err error)
 		GetPurchaseOrderItemByAllocation(ctx context.Context, ids []int) (data []models.PurchaseOrderItem, err error)
 		GetAvailableReceiveOrder(ctx context.Context, tenant string, supplierId, productId int64) (data []models.PurchaseOrderItem, err error)
+		GetPurchaseOrderTotal(ctx context.Context, tenant string, startDate, endDate string) (data models.PurchaseOrderItemTotal, err error)
 
 		SaveReceiveOrder(ctx context.Context, data models.ReceiveOrder) error
 		GetReceiveOrderItemByProductId(ctx context.Context, id int64) (data []models.ReceiveOrderItem, err error)
-		GetReceiveOrderList(ctx context.Context, tenant string, customerId int64, page, limit int, dueDate string) ([]models.ReceiveOrder, int64, error)
+		GetReceiveOrderList(ctx context.Context, tenant string, customerId int64, page, limit int, dueDate, startDate, endDate, paymentStatus string) ([]models.ReceiveOrder, int64, error)
 		GetReceiveOrderById(ctx context.Context, id int64) (data models.ReceiveOrder, err error)
 		GetReceiveOrderByProductId(ctx context.Context, id int64) (data []models.ReceiveOrder, err error)
 		UpdateStatusReceiveOrder(ctx context.Context, id int64, status string) error
+		UpdatePaymentStatusReceiveOrder(ctx context.Context, id int64, status string, paymentDate time.Time) error
 		TxReceiveOrder(ctx context.Context, reqReceiveOrder models.ReceiveOrder, reqReceiveOrderItem []models.ReceiveOrderItem, reqPurchaseOrderItems []models.PurchaseOrderItem, reqProducts []models.Product) error
 		TxStockedOrder(ctx context.Context, reqReceiveOrder models.ReceiveOrder, reqPurchaseOrderItems []models.PurchaseOrderItem, reqProducts []models.Product, reqProductLocations []models.ProductLocation, reqReceiveOrderItems []models.ReceiveOrderItem, boSales []models.SalesOrderItem) error
 
@@ -108,9 +118,17 @@ type (
 		GetPackingOrderItemById(ctx context.Context, id int64) (data models.PackingOrderItem, err error)
 		UpdatePackingOrder(ctx context.Context, data models.PackingOrder) error
 
+		SaveAccountPayable(ctx context.Context, data models.AccountPayable) error
+		GetAccountPayableList(ctx context.Context, tenant string, req cModels.ReqListFinance) ([]models.AccountPayable, int64, error)
+		SaveAccountReceivable(ctx context.Context, data models.AccountReceiveble) error
+		GetAccountReceivableList(ctx context.Context, tenant string, req cModels.ReqListFinance) ([]models.AccountReceiveble, int64, error)
+		GetAccountReceivableTotal(ctx context.Context, tenant string, req cModels.ReqListFinance) (float64, error)
+		GetAccountPayableTotal(ctx context.Context, tenant string, req cModels.ReqListFinance) (float64, error)
+
 		SaveInvoiceOrder(ctx context.Context, data models.InvoiceOrder) error
-		GetInvoiceList(ctx context.Context, tenant string, customerId int64, page, limit int, dueDate string) ([]models.InvoiceOrder, int64, error)
-		GetInvoiceOrderById(ctx context.Context, id int64) (data models.InvoiceOrderResponse, err error)
+		GetInvoiceList(ctx context.Context, tenant string, customerId int64, page, limit int, dueDate, startDate, endDate, paymentStatus string) ([]models.InvoiceOrder, int64, error)
+		GetInvoiceOrderById(ctx context.Context, id int64) (data models.InvoiceOrder, err error)
+		UpdatePaymentStatusInvoiceOrder(ctx context.Context, id int64, status string, paymentDate time.Time) error
 		TxInvoiceOrder(ctx context.Context, reqInvoiceOrder models.InvoiceOrder, reqInvoiceOrderItem []models.InvoiceOrderItem, reqPackingOrder models.PackingOrder, reqSalesOrderItem []models.SalesOrderItem, products []models.Product, productLocations []models.ProductLocation) error
 
 		SaveInvoiceOrderItem(ctx context.Context, data []*models.InvoiceOrderItem) error

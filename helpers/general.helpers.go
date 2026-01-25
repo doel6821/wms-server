@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"crypto/rand"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -269,6 +270,59 @@ func JoinInts(ints []int, sep string) string {
 	}
 	return strings.Join(strs, sep)
 }
+
+// MonthsElapsed menghitung jumlah bulan penuh yang telah berlalu
+// antara waktu t1 (awal/createdAt) dan t2 (akhir/sekarang).
+func MonthsElapsed(t1, t2 time.Time) int {
+    // 1. Pastikan t2 (waktu akhir) lebih lambat dari t1 (waktu awal)
+	if t1.After(t2) {
+		t1, t2 = t2, t1 // Swap jika t1 lebih baru dari t2
+	}
+
+    // 2. Ekstrak komponen Tahun dan Bulan
+	year1, month1, _ := t1.Date()
+	year2, month2, _ := t2.Date()
+	
+    // 3. Hitung selisih Tahun dalam satuan bulan
+    // Contoh: 2025 - 2024 = 1 tahun * 12 = 12 bulan
+	diffYears := year2 - year1
+	totalMonths := diffYears * 12
+	
+    // 4. Tambahkan/kurangi selisih Bulan
+	totalMonths += int(month2) - int(month1)
+
+    // 5. Penyesuaian Harian (Mengecek Bulan Penuh)
+    // Jika hari di t2 (waktu akhir) lebih kecil dari hari di t1 (waktu awal), 
+    // maka bulan terakhir belum terhitung penuh. Kurangi 1 bulan.
+    // Contoh: 31 Jan (t1) ke 15 Feb (t2). Selisih total 1 bulan. Namun,
+    // hari (15) < hari (31), jadi bulan Februari belum penuh. totalMonths - 1.
+    // Contoh: 31 Jan (t1) ke 31 Mar (t2). Selisih total 2 bulan. Hari (31) >= Hari (31).
+	if t2.Day() < t1.Day() {
+		totalMonths--
+	}
+	
+	return totalMonths
+}
+
+
+const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
+// RandomString menghasilkan string acak alfanumerik sepanjang n karakter
+func RandomString(n int) string {
+	result := make([]byte, n)
+	for i := range result {
+		num, err := rand.Int(rand.Reader, big.NewInt(int64(len(charset))))
+		if err != nil {
+			// fallback kalau error (sangat jarang terjadi)
+			result[i] = charset[0]
+			continue
+		}
+		result[i] = charset[num.Int64()]
+	}
+	return string(result)
+}
+
+
 
 
 // END __INCLUDE_TEMPLATE__

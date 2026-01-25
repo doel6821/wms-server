@@ -33,11 +33,13 @@ func (u *usecase) SaveSupplier(ctx context.Context, req cModels.RegisterSupplier
 			if err != nil {
 				u.Logs.WithContext(ctx).WithError(err).Error("failed save Supplier")
 				res.Meta = helpers.GetMetaResponse(constants.RC_GENERAL_ERROR)
+				res.Meta.Message = "Gagal menyimpan data supplier"
 				return res
 			}
 		} else if supplier.ID != 0 {
 			u.Logs.WithContext(ctx).WithError(err).Error("phone number already used")
 			res.Meta = helpers.GetMetaResponse(constants.RC_PHONE_NUMBER_ALREADY_USED)
+			res.Meta.Message = "nomor telepon sudah terdaftar"
 			return res
 		}
 	} else {
@@ -56,6 +58,7 @@ func (u *usecase) SaveSupplier(ctx context.Context, req cModels.RegisterSupplier
 		if err != nil {
 			u.Logs.WithContext(ctx).WithError(err).Error("failed save Supplier")
 			res.Meta = helpers.GetMetaResponse(constants.RC_GENERAL_ERROR)
+			res.Meta.Message = "Gagal menyimpan data supplier"
 			return res
 		}
 	}

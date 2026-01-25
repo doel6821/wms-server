@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -29,7 +28,6 @@ func (c *v1Controller) SaveSalesOrder(ctx *gin.Context) {
 
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		fmt.Println(err)
 		res.Meta = helpers.GetMetaResponse(constants.RC_BADREQUEST)
 		ctx.JSON(http.StatusBadRequest, res)
 		return

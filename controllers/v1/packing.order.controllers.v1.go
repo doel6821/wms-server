@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -64,7 +63,6 @@ func (c *v1Controller) ListPackingOrder(ctx *gin.Context) {
 	} else {
 		page, err = strconv.Atoi(ctx.Query("page"))
 		if err != nil {
-			fmt.Println("error1", err)
 			res.Meta = helpers.GetMetaResponse(constants.RC_BADREQUEST)
 			ctx.JSON(http.StatusBadRequest, res)
 			return	
@@ -76,7 +74,6 @@ func (c *v1Controller) ListPackingOrder(ctx *gin.Context) {
 	} else {
 		limit, err = strconv.Atoi(ctx.Query("limit"))
 		if err != nil {
-			fmt.Println("error2", err)
 			res.Meta = helpers.GetMetaResponse(constants.RC_BADREQUEST)
 			ctx.JSON(http.StatusBadRequest, res)
 			return	
@@ -87,7 +84,6 @@ func (c *v1Controller) ListPackingOrder(ctx *gin.Context) {
 	if customer != "" {
 		customerId, err = strconv.Atoi(ctx.Query("customerId"))
 		if err != nil {
-			fmt.Println("error3", err)
 			res.Meta = helpers.GetMetaResponse(constants.RC_BADREQUEST)
 			ctx.JSON(http.StatusBadRequest, res)
 			return	

@@ -2,6 +2,7 @@ package postgre
 
 import (
 	"context"
+	"time"
 	"wms-server/constants"
 	"wms-server/databases/postgre/models"
 
@@ -21,7 +22,7 @@ func (d *postgreDatabase) SaveReceiveOrder(ctx context.Context, data models.Rece
 }
 
 // GetList ...
-func (d *postgreDatabase) GetReceiveOrderList(ctx context.Context, tenant string, supplierId int64, page, limit int, dueDate string) ([]models.ReceiveOrder, int64, error) {
+func (d *postgreDatabase) GetReceiveOrderList(ctx context.Context, tenant string, supplierId int64, page, limit int, dueDate, startDate, endDate, paymentStatus string) ([]models.ReceiveOrder, int64, error) {
 	query := d.Db.WithContext(ctx)
 
 	var res []models.ReceiveOrder
@@ -34,6 +35,14 @@ func (d *postgreDatabase) GetReceiveOrderList(ctx context.Context, tenant string
 
 	if dueDate != "" {
 		query = query.Where("due_date between ? and ? ", dueDate+" 00:00:00", dueDate+" 23:59:59")
+	}
+
+	if paymentStatus != "" {
+		query = query.Where("payment_status = ?", paymentStatus)
+	}
+
+	if startDate != "" && endDate != "" {
+		query = query.Where("invoice_date between ? and ? ", startDate+" 00:00:00", endDate+" 23:59:59")
 	}
 
 	err := query.Preload("Supplier").Preload("Items").Order("id desc").Limit(limit).Offset((page - 1) * limit).Find(&res).Limit(-1).Offset(-1).Count(&total).Error
@@ -209,5 +218,23 @@ func (d *postgreDatabase) TxSaveReceiveOrderItems(ctx context.Context, query *go
 			}
 		}
 	}
+	return nil
+}
+
+// UpdatePaymentStatusReceiveOrder ...
+func (d *postgreDatabase) UpdatePaymentStatusReceiveOrder(ctx context.Context, id int64, status string, paymentDate time.Time) error {
+	d.Logs.WithContext(ctx).WithField("data", status).Info("UpdateStatusReceiveOrder")
+	query := d.Db.WithContext(ctx)
+
+	if err := query.Model(&models.ReceiveOrder{}).
+		Where("id = ?", id).
+		Updates(map[string]interface{}{
+			"payment_status":  status,
+			"payment_date":      paymentDate,
+		}).Error; err != nil {
+		d.Logs.WithContext(ctx).WithError(err).Error("Error Update ReceiveOrder")
+		return err
+	}
+
 	return nil
 }

@@ -112,10 +112,16 @@ func (r *Router) routerControllers() {
 		// version 1
 		v1 := main.Group("/v1")
 		v1.POST("/login", r.Controller.V1().Login)
+		v1.POST("/forgot", r.Controller.V1().ForgotPassword)
+		v1.POST("/change-password", r.Controller.V1().ChangePassword)
 		v1.POST("/register-user", r.Controller.V1().CekToken, r.Controller.V1().RegisterUser)
 		v1.POST("/update-user/:id", r.Controller.V1().CekToken, r.Controller.V1().UpdateUser)
 		v1.POST("/register-tenant", r.Controller.V1().RegisterTenant)
 		v1.GET("/user/all", r.Controller.V1().CekToken, r.Controller.V1().ListUser)
+
+		dashboard := v1.Group("/dashboard")	
+		dashboard.GET("/", r.Controller.V1().CekToken, r.Controller.V1().GetDataDashboard)
+		
 
 		customer := v1.Group("/customer")
 		customer.GET("/all", r.Controller.V1().CekToken, r.Controller.V1().ListCustomer)
@@ -131,6 +137,7 @@ func (r *Router) routerControllers() {
 
 		product := v1.Group("/product")
 		product.GET("/all", r.Controller.V1().CekToken, r.Controller.V1().ListProduct)
+		product.GET("/total", r.Controller.V1().CekToken, r.Controller.V1().ProductTotal)
 		product.GET("/:id", r.Controller.V1().CekToken, r.Controller.V1().GetProductById)
 		product.POST("/", r.Controller.V1().CekToken, r.Controller.V1().SaveProduct)
 		product.DELETE("/:id", r.Controller.V1().CekToken, r.Controller.V1().DeleteProductById)
@@ -141,6 +148,13 @@ func (r *Router) routerControllers() {
 		location.GET("/:id", r.Controller.V1().CekToken, r.Controller.V1().GetLocationById)
 		location.POST("/", r.Controller.V1().CekToken, r.Controller.V1().SaveLocation)
 		location.DELETE("/:id", r.Controller.V1().CekToken, r.Controller.V1().DeleteLocationById)
+
+		config := v1.Group("/config")
+		config.GET("/all", r.Controller.V1().CekToken, r.Controller.V1().ListConfiguration)
+		// config.GET("/:code", r.Controller.V1().CekToken, r.Controller.V1().GetConfigurationByName)
+		config.GET("/:id", r.Controller.V1().CekToken, r.Controller.V1().GetConfigurationById)
+		config.POST("/", r.Controller.V1().CekToken, r.Controller.V1().SaveConfiguration)
+		config.DELETE("/:id", r.Controller.V1().CekToken, r.Controller.V1().DeleteConfigurationById)
 
 		sales := v1.Group("/sales-order")
 		sales.GET("/all", r.Controller.V1().CekToken, r.Controller.V1().ListSalesOrder)
@@ -164,9 +178,16 @@ func (r *Router) routerControllers() {
 		invoice.POST("/", r.Controller.V1().CekToken, r.Controller.V1().SaveInvoice)
 		invoice.PUT("/", r.Controller.V1().CekToken, r.Controller.V1().UpdateInvoiceOrder)
 
+		finance := v1.Group("/finance")
+		finance.GET("/payment/all", r.Controller.V1().CekToken, r.Controller.V1().ListAccountPayable)
+		finance.GET("/receive/all", r.Controller.V1().CekToken, r.Controller.V1().ListAccountReceivable)
+		finance.POST("/payment", r.Controller.V1().CekToken, r.Controller.V1().SaveAccountPayable)
+		finance.POST("/receive", r.Controller.V1().CekToken, r.Controller.V1().SaveAccountReceivable)
+
 		purchase := v1.Group("/purchase")
 		purchase.GET("/all", r.Controller.V1().CekToken, r.Controller.V1().ListPurchaseOrder)
 		purchase.GET("/:id", r.Controller.V1().CekToken, r.Controller.V1().GetPurchaseOrderById)
+		purchase.GET("/recomendation/:id", r.Controller.V1().CekToken, r.Controller.V1().PurchaseOrderRecomendation)
 		purchase.POST("/", r.Controller.V1().CekToken, r.Controller.V1().SavePurchaseOrder)
 
 		receive := v1.Group("/receive-order")
@@ -177,9 +198,7 @@ func (r *Router) routerControllers() {
 		receive.POST("/", r.Controller.V1().CekToken, r.Controller.V1().SaveReceiveOrder)
 		receive.POST("/stocked", r.Controller.V1().CekToken, r.Controller.V1().SaveStocked)
 		receive.PUT("/", r.Controller.V1().CekToken, r.Controller.V1().UpdateReceiveOrder)
-		// report := v1.Group("/report")
-		// report.GET("/sales", r.Controller.V1().)
-		// report.GET("/purchase", r.Controller.V1().)
+		
 
 
 	}

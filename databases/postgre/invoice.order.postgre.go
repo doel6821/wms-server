@@ -2,6 +2,7 @@ package postgre
 
 import (
 	"context"
+	"time"
 	"wms-server/constants"
 	"wms-server/databases/postgre/models"
 
@@ -20,8 +21,26 @@ func (d *postgreDatabase) SaveInvoiceOrder(ctx context.Context, data models.Invo
 	return nil
 }
 
+// UpdateStatusInvoiceOrder ...
+func (d *postgreDatabase) UpdatePaymentStatusInvoiceOrder(ctx context.Context, id int64, status string, paymentDate time.Time) error {
+	d.Logs.WithContext(ctx).WithField("data", status).Info("UpdateStatusInvoiceOrder")
+	query := d.Db.WithContext(ctx)
+
+	if err := query.Model(&models.InvoiceOrder{}).
+		Where("id = ?", id).
+		Updates(map[string]interface{}{
+			"payment_status":  status,
+			"payment_date":      paymentDate,
+		}).Error; err != nil {
+		d.Logs.WithContext(ctx).WithError(err).Error("Error Update InvoiceOrder")
+		return err
+	}
+
+	return nil
+}
+
 // GetList ...
-func (d *postgreDatabase) GetInvoiceList(ctx context.Context, tenant string, customerId int64, page, limit int, dueDate string) ([]models.InvoiceOrder, int64, error) {
+func (d *postgreDatabase) GetInvoiceList(ctx context.Context, tenant string, customerId int64, page, limit int, dueDate, startDate, endDate, paymentStatus string) ([]models.InvoiceOrder, int64, error) {
 	query := d.Db.WithContext(ctx)
 
 	var res []models.InvoiceOrder
@@ -36,7 +55,15 @@ func (d *postgreDatabase) GetInvoiceList(ctx context.Context, tenant string, cus
 		query = query.Where("due_date between ? and ? ", dueDate+" 00:00:00", dueDate+" 23:59:59")
 	}
 
-	err := query.Order("id desc").Limit(limit).Offset((page - 1) * limit).Find(&res).Limit(-1).Offset(-1).Count(&total).Error
+	if paymentStatus != "" {
+		query = query.Where("payment_status = ?", paymentStatus)
+	}
+
+	if startDate != "" && endDate != "" {
+		query = query.Where("invoice_date between ? and ? ", startDate+" 00:00:00", endDate+" 23:59:59")
+	}
+
+	err := query.Preload("Customer").Preload("InvoiceItems").Order("id desc").Limit(limit).Offset((page - 1) * limit).Find(&res).Limit(-1).Offset(-1).Count(&total).Error
 
 	if err != nil {
 		d.Logs.WithContext(ctx).WithError(err).Error("Error get InvoiceOrder list")
@@ -47,11 +74,10 @@ func (d *postgreDatabase) GetInvoiceList(ctx context.Context, tenant string, cus
 }
 
 // GetInvoiceOrderById ...
-func (d *postgreDatabase) GetInvoiceOrderById(ctx context.Context, id int64) (data models.InvoiceOrderResponse, err error) {
+func (d *postgreDatabase) GetInvoiceOrderById(ctx context.Context, id int64) (data models.InvoiceOrder, err error) {
 	query := d.Db.WithContext(ctx)
 
-	var order models.InvoiceOrderResponse
-	err = query.Preload("InvoiceItems").First(&order, id).Error
+	err = query.Preload("Customer").Preload("InvoiceItems").First(&data, id).Error
 	if err != nil {
 		d.Logs.WithContext(ctx).WithError(err).Error("Error getting existing data")
 		return data, err

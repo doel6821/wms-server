@@ -2,7 +2,6 @@ package usecases
 
 import (
 	"context"
-	"fmt"
 	"strings"
 	"wms-server/constants"
 	cModels "wms-server/controllers/v1/models"
@@ -20,7 +19,7 @@ func (u *usecase) SaveCustomer(ctx context.Context, req cModels.RegisterCustomer
 	var err error
 	if req.ID == 0 {
 		customer, err = u.DB.GetPostgre().GetCustomerByPhone(ctx, req.Phone, req.Tenant)
-		fmt.Println(err)
+		
 		if err != nil && err.Error() == "record not found" {
 
 			customer.Name = req.Name
@@ -36,11 +35,13 @@ func (u *usecase) SaveCustomer(ctx context.Context, req cModels.RegisterCustomer
 			if err != nil {
 				u.Logs.WithContext(ctx).WithError(err).Error("failed save customer")
 				res.Meta = helpers.GetMetaResponse(constants.RC_GENERAL_ERROR)
+				res.Meta.Message = "Gagal menyimpan data pelanggan"
 				return res
 			}
 		} else if customer.ID != 0 {
-			u.Logs.WithContext(ctx).WithError(err).Error("phone number already used")
+			u.Logs.WithContext(ctx).WithError(err).Error("nomor telepon sudah terdaftar")
 			res.Meta = helpers.GetMetaResponse(constants.RC_PHONE_NUMBER_ALREADY_USED)
+			res.Meta.Message = "nomor telepon sudah terdaftar"
 			return res
 		}
 	} else {
@@ -60,6 +61,7 @@ func (u *usecase) SaveCustomer(ctx context.Context, req cModels.RegisterCustomer
 		if err != nil {
 			u.Logs.WithContext(ctx).WithError(err).Error("failed save customer")
 			res.Meta = helpers.GetMetaResponse(constants.RC_GENERAL_ERROR)
+			res.Meta.Message = "Gagal menyimpan data pelanggan"
 			return res
 		}
 	}

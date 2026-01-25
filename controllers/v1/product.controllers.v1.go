@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -30,7 +29,6 @@ func (c *v1Controller) SaveProduct(ctx *gin.Context) {
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		res.Meta = helpers.GetMetaResponse(constants.RC_BADREQUEST)
-		fmt.Println("apakah disini error" , err)
 		ctx.JSON(http.StatusBadRequest, res)
 		return
 	}
@@ -89,7 +87,6 @@ func (c *v1Controller) ListProduct(ctx *gin.Context) {
 	code = ctx.Query("code")
 	supplier = ctx.Query("supplier")
 	tenant := ctx.GetString("tenant")
-	fmt.Println(tenant)
 	res = c.Usecase.GetProductList(ctx, tenant, name, code, supplier, page, limit)
 	c.Logs.WithFields(helpers.GettingResponseLog( ctx, name, res, time.Since(trxTime))).Info("Get Product List")
 	ctx.JSON(http.StatusOK, res)
@@ -150,3 +147,27 @@ func (c *v1Controller) DeleteProductById(ctx *gin.Context) {
 	c.Logs.WithFields(helpers.GettingResponseLog( ctx, id, res, time.Since(trxTime))).Info("Delete Product")
 	ctx.JSON(http.StatusOK, res)
 }
+
+
+// @Summary Get List Product
+// @Description Get List Product 
+// @ID GetListProduct
+// @Param Authorization header string true "Bearer"
+// @Param page query int true "Page"
+// @Param limit query int true "Limit"
+// @Param name query string false "Name"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} models.Response
+// @Failure 400 {object} models.Response
+// @Router /wms-server/v.1/product/total [get]
+func (c *v1Controller) ProductTotal(ctx *gin.Context) {
+	trxTime := time.Now()
+	var res hModels.Response
+	
+	tenant := ctx.GetString("tenant")
+	res = c.Usecase.GetProductTotal(ctx, tenant)
+	c.Logs.WithFields(helpers.GettingResponseLog( ctx, tenant, res, time.Since(trxTime))).Info("Get Product Total")
+	ctx.JSON(http.StatusOK, res)
+}
+

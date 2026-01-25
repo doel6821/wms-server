@@ -33,3 +33,13 @@ type SalesOrderItemRes struct {
 	Price              float64 `json:"price"`
 	Total              float64 `json:"totalAmount"`
 }
+
+type SalesOrderItemTotal struct {
+	TotalItem            int64   `json:"totalItem"`
+	TotalOrderQty        int64   `json:"totalOrderQty"`
+	TotalAllocationQty   int64   `json:"totalAllocationQty"`
+	TotalBackOrderQty    int64   `json:"totalBackOrderQty"`
+	TotalPackingOrderQty int64   `json:"totalPackingOrderQty"`
+	TotalInvoiceQty      int64   `json:"totalInvoiceQty"`
+	TotalAmount          float64 `json:"totalAmount"`
+}

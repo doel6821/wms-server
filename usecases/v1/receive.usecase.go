@@ -24,13 +24,12 @@ func (u *usecase) CreateReceive(ctx context.Context, tenant string, req cModels.
 		res.Meta = helpers.GetMetaResponse(constants.RC_GENERAL_ERROR)
 		return res
 	}
-	paymentStatus := "Lunas"
+	paymentStatus := "Belum Lunas"
 	dueDate := time.Now()
-	if supplier.TermOfPayment != "cash" {
-		lt, _ := strconv.Atoi(strings.Split(supplier.TermOfPayment, " ")[0])
-		dueDate = dueDate.Add(time.Duration(lt*24) * time.Hour)
-		paymentStatus = "Belum Lunas"
-	}
+	
+	lt, _ := strconv.Atoi(strings.Split(supplier.TermOfPayment, " ")[0])
+	dueDate = dueDate.Add(time.Duration(lt*24) * time.Hour)
+	
 
 	receive := pModels.ReceiveOrder{
 		SupplierId:    req.SupplierID,
@@ -45,6 +44,9 @@ func (u *usecase) CreateReceive(ctx context.Context, tenant string, req cModels.
 	receiveItems := []pModels.ReceiveOrderItem{}
 	products := []pModels.Product{}
 	purchaseOrderItems := []pModels.PurchaseOrderItem{}
+
+	amount := 0.0
+	totalAmount := 0.0
 
 	for _, v := range req.ReceiveOrders {
 		product, err := u.DB.GetPostgre().GetProductById(ctx, v.ProductId)
@@ -62,6 +64,7 @@ func (u *usecase) CreateReceive(ctx context.Context, tenant string, req cModels.
 			ProductId:       v.ProductId,
 			ProductCode:     product.Code,
 			ProductName:     product.Name,
+			Price:           v.Price,
 			ProductLocation: location,
 			ReceiveOrderQty: v.ReceiveOrderQtty,
 			PurchasePrice:   v.PurchasePrice,
@@ -69,8 +72,10 @@ func (u *usecase) CreateReceive(ctx context.Context, tenant string, req cModels.
 
 		receiveItems = append(receiveItems, receiveItem)
 
-		// update product deduct qtty on packing
+		amount += float64(v.ReceiveOrderQtty)* v.Price
+		totalAmount += float64(v.ReceiveOrderQtty)* v.PurchasePrice
 
+		// update product deduct qtty on packing
 		product.StockOnPurchase -= v.ReceiveOrderQtty
 		product.StockOnReceive += v.ReceiveOrderQtty
 		products = append(products, product)
@@ -90,6 +95,8 @@ func (u *usecase) CreateReceive(ctx context.Context, tenant string, req cModels.
 	// update purchase order item
 	// update product and qtty on receive
 	receive.Items = receiveItems
+	receive.Amount = amount
+	receive.TotalAmount = totalAmount
 
 	err = u.DB.GetPostgre().TxReceiveOrder(ctx, receive, receiveItems, purchaseOrderItems, products)
 	if err != nil {
@@ -102,12 +109,12 @@ func (u *usecase) CreateReceive(ctx context.Context, tenant string, req cModels.
 	return res
 }
 
-func (u *usecase) GetReceiveList(ctx context.Context, tenant string, customerId int64, page, limit int, dueDate string) hModels.Response {
+func (u *usecase) GetReceiveList(ctx context.Context, tenant string, customerId int64, page, limit int, dueDate, startDate, endDate, paymentStatus string) hModels.Response {
 	res := hModels.Response{
 		Meta: helpers.GetMetaResponse(constants.RC_GENERAL_ERROR),
 	}
 
-	listReceiveOrder, total, err := u.DB.GetPostgre().GetReceiveOrderList(ctx, tenant, customerId, page, limit, dueDate)
+	listReceiveOrder, total, err := u.DB.GetPostgre().GetReceiveOrderList(ctx, tenant, customerId, page, limit, dueDate, startDate, endDate, paymentStatus)
 	if err != nil {
 		u.Logs.WithContext(ctx).WithError(err).Error("failed get ReceiveOrder list")
 		res.Meta = helpers.GetMetaResponse(constants.RC_GENERAL_ERROR)

@@ -128,6 +128,9 @@ func (c *v1Controller) ListReceiveOrder(ctx *gin.Context) {
 
 	supplierIdStr := ctx.Query("supplierId")
 	dueDate := ctx.Query("dueDate")
+	startDate := ctx.Query("startDate")
+	endDate := ctx.Query("endDate")
+	paymentStatus := ctx.Query("paymentStatus")
 	var supplierId int
 	if supplierIdStr != "" {
 		supplierId, err = strconv.Atoi(supplierIdStr)
@@ -139,7 +142,7 @@ func (c *v1Controller) ListReceiveOrder(ctx *gin.Context) {
 	}
 	tenant := ctx.GetString("tenant")
 
-	res = c.Usecase.GetReceiveList(ctx, tenant, int64(supplierId), page, limit, dueDate)
+	res = c.Usecase.GetReceiveList(ctx, tenant, int64(supplierId), page, limit, dueDate, startDate, endDate, paymentStatus)
 	c.Logs.WithFields(helpers.GettingResponseLog( ctx, supplierId, res, time.Since(trxTime))).Info("Get ReceiveOrder List")
 	ctx.JSON(http.StatusOK, res)
 }

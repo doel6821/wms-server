@@ -2,6 +2,8 @@ package usecases
 
 import (
 	"context"
+	"crypto/sha512"
+	"encoding/hex"
 	"fmt"
 	"strings"
 	"wms-server/constants"
@@ -82,7 +84,6 @@ func (u *usecase) RegisterTenant(ctx context.Context, req cModels.RegisterReques
 	res := hModels.Response{
 		Meta: helpers.GetMetaResponse(constants.RC_GENERAL_ERROR),
 	}
-	fmt.Println("usecase register tenant")
 
 	user, err := u.DB.GetPostgre().FindUser(ctx, strings.ToLower(req.Email))
 	if err != nil && err.Error() != "record not found" {
@@ -163,4 +164,84 @@ func (u *usecase) GetUserList(ctx context.Context, tenant, email string, page, l
 	res.Count = total
 	res.Meta = helpers.GetMetaResponse(constants.RC_SUCCESS)
 	return res
+}
+
+
+func (u *usecase) ForgotPassword(ctx context.Context, req cModels.LoginRequest) hModels.Response {
+	res := hModels.Response{
+		Meta: helpers.GetMetaResponse(constants.RC_GENERAL_ERROR),
+	}
+
+	user, err := u.DB.GetPostgre().FindUser(ctx, req.Email)
+	if err != nil {
+		u.Logs.WithContext(ctx).WithError(err).Error("Error get existing data")
+		return res
+	}
+
+	random := helpers.RandomString(10)
+	sum := sha512.Sum512([]byte(random))
+	newPassword := hex.EncodeToString(sum[:])
+	fmt.Println("newPassword : ", random)
+	fmt.Println(newPassword)
+	user.Password = newPassword
+
+	err = u.DB.GetPostgre().Save(ctx, user)
+	if err != nil {
+		u.Logs.WithContext(ctx).WithError(err).Error("failed save user")
+		res.Meta = helpers.GetMetaResponse(constants.RC_GENERAL_ERROR)
+		return res
+	}
+
+	to := req.Email
+	subject := "Reset Password"
+	templateEmail := `
+		<p>Hi, Kami telah menerima permintaanmu untuk melakukan reset password akun WMS.</p>
+		<p>Silahkan login ulang menggunakan username dan password dibawah: </p>
+		<p>Username: ` + req.Email + `</p>
+		<p>Password: ` + newPassword + `</p>
+		<br>
+		<p>Abaikan email ini jika kamu tidak pernah meminta untuk melakukan reset password.</p>`
+
+	err = u.MailSmpt.SendEmailSMTP(to, "" ,subject, templateEmail)
+	if err != nil {
+		u.Logs.WithContext(ctx).WithError(err).Error("failed send email")
+		res.Meta = helpers.GetMetaResponse(constants.RC_GENERAL_ERROR)
+		return res
+	}
+	
+	res.Meta = helpers.GetMetaResponse(constants.RC_SUCCESS)
+	return res
+}
+
+
+func (u *usecase) ChangePassword(ctx context.Context, req cModels.ChangePasswordRequest) hModels.Response {
+	res := hModels.Response{
+		Meta: helpers.GetMetaResponse(constants.RC_GENERAL_ERROR),
+	}
+
+	user, err := u.DB.GetPostgre().FindUser(ctx, req.Email)
+	if err != nil {
+		u.Logs.WithContext(ctx).WithError(err).Error("Error get existing data")
+		return res
+	}
+
+	if user.Password != req.OldPassword {
+		u.Logs.WithContext(ctx).WithError(err).Error("password tidak sesuai")
+		res.Meta = helpers.GetMetaResponse(constants.RC_BADREQUEST)
+		return res
+	}
+
+	
+	user.Password = req.NewPassword
+
+	err = u.DB.GetPostgre().Save(ctx, user)
+	if err != nil {
+		u.Logs.WithContext(ctx).WithError(err).Error("failed save user")
+		res.Meta = helpers.GetMetaResponse(constants.RC_GENERAL_ERROR)
+		return res
+	}
+	
+	res.Meta = helpers.GetMetaResponse(constants.RC_SUCCESS)
+	return res
+
 }

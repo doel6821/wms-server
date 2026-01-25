@@ -33,7 +33,7 @@ type ReceiveOrderDetail struct {
 	PurchaseOrderID  int64   `json:"purchaseOrderId"`
 	ProductId        int64   `json:"productId"`
 	ProductName      string  `json:"productName"`
-	ProductPrice     string  `json:"productPrice"`
+	Price            float64 `json:"price"`
 	ReceiveOrderQtty int     `json:"receiveOrderQty"`
 	PurchasePrice    float64 `json:"purchasePrice"`
 }

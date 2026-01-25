@@ -32,3 +32,20 @@ type PurchaseOrderItemRes struct {
 	Price           float64 `json:"price"`
 	Total           float64 `json:"totalAmount"`
 }
+
+type PurchaseOrderRecomendation struct {
+	SupplierId  int64   `json:"supplierId"`
+	ProductId   int64   `json:"productId"`
+	ProductName string  `json:"productName"`
+	OrderQty    int     `json:"orderQty"`
+	Price       float64 `json:"price"`
+	Total       float64 `json:"totalAmount"`
+}
+
+type PurchaseOrderItemTotal struct {
+	TotalItem       int64   `json:"totalItem"`
+	TotalOrderQty   int64   `json:"totalOrderQty"`
+	TotalReceiveQty int64   `json:"totalReceiveQty"`
+	TotalStockedQty int64   `json:"totalStockedQty"`
+	TotalAmount     float64 `json:"totalAmount"`
+}

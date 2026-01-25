@@ -11,6 +11,9 @@ type ReceiveOrder struct {
 	Status        string             `json:"status"`
 	DueDate       time.Time          `json:"dueDate"`
 	PaymentStatus string             `json:"paymentStatus"`
+	PaymentDate   time.Time          `json:"paymentDate"`
+	Amount        float64            `json:"amount"`
+	TotalAmount   float64            `json:"totalAmount"`
 	Tenant        string             `json:"tenant"`
 	Items         []ReceiveOrderItem `json:"items" gorm:"Foreignkey:receive_order_id;association_foreignkey:ID;"`
 }

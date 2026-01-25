@@ -2,6 +2,7 @@ package usecases
 
 import (
 	"context"
+	"time"
 	"wms-server/constants"
 	cModels "wms-server/controllers/v1/models"
 	pModels "wms-server/databases/postgre/models"
@@ -31,8 +32,9 @@ func (u *usecase) SaveProduct(ctx context.Context, tenant string, req cModels.Re
 			product.StockOnPurchase = req.StockOnPurchase
 			product.StockOnReceive = req.StockOnReceive
 			product.StockPacking = req.StockPacking
-			product.LeadTimeDays = req.LeadTimeDays
+			// product.LeadTimeDays = req.LeadTimeDays
 			product.Tenant = tenant
+			product.CreatedAt = time.Now()
 
 			err = u.DB.GetPostgre().SaveProduct(ctx, product)
 			if err != nil {
@@ -41,8 +43,9 @@ func (u *usecase) SaveProduct(ctx context.Context, tenant string, req cModels.Re
 				return res
 			}
 		} else if product.ID != 0 {
-			u.Logs.WithContext(ctx).WithError(err).Error("phone number already used")
+			u.Logs.WithContext(ctx).WithError(err).Error("kode produk sudah terdaftar")
 			res.Meta = helpers.GetMetaResponse(constants.RC_PHONE_NUMBER_ALREADY_USED)
+			res.Meta.Message = "kode produk sudah terdaftar"
 			return res
 		}
 	} else {
@@ -59,7 +62,7 @@ func (u *usecase) SaveProduct(ctx context.Context, tenant string, req cModels.Re
 			StockOnPurchase: req.StockOnPurchase,
 			StockOnReceive:  req.StockOnReceive,
 			StockPacking:    req.StockPacking,
-			LeadTimeDays:    req.LeadTimeDays,
+			// LeadTimeDays:    req.LeadTimeDays,
 			Tenant:          tenant,
 		}
 
@@ -120,6 +123,22 @@ func (u *usecase) DeleteProductId(ctx context.Context, id int64) hModels.Respons
 		return res
 	}
 
+	res.Meta = helpers.GetMetaResponse(constants.RC_SUCCESS)
+	return res
+}
+
+func (u *usecase) GetProductTotal(ctx context.Context, tenant string) hModels.Response {
+	res := hModels.Response{
+		Meta: helpers.GetMetaResponse(constants.RC_GENERAL_ERROR),
+	}
+
+	totalProduct, err := u.DB.GetPostgre().GetProductTotal(ctx,tenant)
+	if err != nil {
+		u.Logs.WithContext(ctx).WithError(err).Error("failed get Product total")
+		res.Meta = helpers.GetMetaResponse(constants.RC_GENERAL_ERROR)
+		return res
+	}
+	res.Data = totalProduct
 	res.Meta = helpers.GetMetaResponse(constants.RC_SUCCESS)
 	return res
 }

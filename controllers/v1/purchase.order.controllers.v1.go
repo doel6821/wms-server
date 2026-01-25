@@ -124,3 +124,31 @@ func (c *v1Controller) GetPurchaseOrderById(ctx *gin.Context) {
 	c.Logs.WithFields(helpers.GettingResponseLog( ctx, id, res, time.Since(trxTime))).Info("Get PurchaseOrder By ID")
 	ctx.JSON(http.StatusOK, res)
 }
+
+
+// @Summary Get Recomendation By Supplier ID
+// @Description Get Recomendation By Supplier ID
+// @ID GetRecomendationBySupplierID
+// @Param Authorization header string true "Bearer"
+// @Param id path int true "ID of Supplier"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} models.Response
+// @Failure 400 {object} models.Response
+// @Router /wms-server/v.1/purchase-order/recomendation/{id} [get]
+func (c *v1Controller) PurchaseOrderRecomendation(ctx *gin.Context) {
+	trxTime := time.Now()
+	var res hModels.Response
+	var err error
+	
+	supplierId, err := strconv.Atoi(ctx.Param("id"))
+	if err != nil {
+		res.Meta = helpers.GetMetaResponse(constants.RC_BADREQUEST)
+		ctx.JSON(http.StatusBadRequest, res)
+		return	
+	}
+	tenant := ctx.GetString("tenant")
+	res = c.Usecase.GetPurchaseOrderRecomendation(ctx, tenant, int64(supplierId))
+	c.Logs.WithFields(helpers.GettingResponseLog( ctx, supplierId, res, time.Since(trxTime))).Info("Get PurchaseOrder By ID")
+	ctx.JSON(http.StatusOK, res)
+}

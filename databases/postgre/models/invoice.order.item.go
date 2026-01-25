@@ -1,13 +1,14 @@
 package models
 
 type InvoiceOrderItem struct {
-	ID              int64    `json:"id"`
-	InvoiceOrderId  int64    `json:"invoiceOrderId"`
-	ProductCode     string  `json:"productCode"`
-	ProductName     string  `json:"productName"`
-	Quantity        int     `json:"quantity"`
-	Price           float64 `json:"price"`
-	Total           float64 `json:"total"`
+	ID             int64   `json:"id"`
+	InvoiceOrderId int64   `json:"invoiceOrderId"`
+	SalesOrderId   int64   `json:"salesOrderId"`
+	ProductCode    string  `json:"productCode"`
+	ProductName    string  `json:"productName"`
+	Quantity       int     `json:"quantity"`
+	Price          float64 `json:"price"`
+	Total          float64 `json:"total"`
 }
 
 func (c *InvoiceOrderItem) TableName() string {
@@ -15,11 +16,11 @@ func (c *InvoiceOrderItem) TableName() string {
 }
 
 type InvoiceOrderItemRes struct {
-	ID              uint    `json:"id"`
-	InvoiceOrderId  uint    `json:"invoiceOrderId"`
-	ProductCode     string  `json:"productCode"`
-	ProductName     string  `json:"productName"`
-	Quantity        int     `json:"quantity"`
-	Price           float64 `json:"price"`
-	Total           float64 `json:"total"`
+	ID             uint    `json:"id"`
+	InvoiceOrderId uint    `json:"invoiceOrderId"`
+	ProductCode    string  `json:"productCode"`
+	ProductName    string  `json:"productName"`
+	Quantity       int     `json:"quantity"`
+	Price          float64 `json:"price"`
+	Total          float64 `json:"total"`
 }

@@ -2,8 +2,6 @@ package postgre
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
 	"wms-server/constants"
 	"wms-server/databases/postgre/models"
 
@@ -75,8 +73,7 @@ func (d *postgreDatabase) TxPurchaseOrder(ctx context.Context, reqPurchaseOrder 
 }
 
 func (d *postgreDatabase) TxSavePurchaseOrder(ctx context.Context, query *gorm.DB, reqPurchaseOrder models.PurchaseOrder) error {
-	bt, _ := json.Marshal(reqPurchaseOrder)
-	fmt.Println(string(bt), "====>")
+	
 	if err := query.Create(&reqPurchaseOrder).Error; err != nil {
 		return err
 	}
