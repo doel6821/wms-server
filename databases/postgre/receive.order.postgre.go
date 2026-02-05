@@ -199,7 +199,11 @@ func (d *postgreDatabase) TxSaveReceiveOrder(ctx context.Context, query *gorm.DB
 
 func (d *postgreDatabase) TxUpdatePurchaseOrderItems(ctx context.Context, query *gorm.DB, reqPurchaseOrderItem []models.PurchaseOrderItem) error {
 	for _, v := range reqPurchaseOrderItem {
-		if err := query.Model(&v).Updates(v).Error; err != nil {
+		if err := query.Model(&v).Updates(map[string]interface{}{
+			"order_qty": v.OrderQty, 
+    		"receive_order_qty": v.ReceiveOrderQty,
+    		"stocked_order_qty": v.StockedOrderQty,
+		}).Error; err != nil {
 			return err
 		}
 	}

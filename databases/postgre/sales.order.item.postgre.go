@@ -49,7 +49,7 @@ func (d *postgreDatabase) GetSalesOrderItemById(ctx context.Context, id int64) (
 func (d *postgreDatabase) GetSalesOrderItemByAllocation(ctx context.Context, ids []int) (data []models.SalesOrderItem, err error) {
 	query := d.Db.WithContext(ctx)
 	
-	if err = query.Where("id in (" + helpers.JoinInts(ids, ",") + ") and allocation_order_qty > 0").Find(&data).Error; err != nil {
+	if err = query.Where("sales_order_id in (" + helpers.JoinInts(ids, ",") + ") and allocation_order_qty > 0").Find(&data).Error; err != nil {
 		d.Logs.WithContext(ctx).WithError(err).Error("Error getting existing data")
 		return data, err
 	}
@@ -108,7 +108,7 @@ func (d *postgreDatabase) GetSalesOrderTotal(ctx context.Context, tenant string,
 	
 	if err = query.Table("sales_order_items soi").Select(`count(soi.product_id) as total_item, sum(soi.order_qty) as total_order_qty , 
 		sum(soi.allocation_order_qty) as total_allocation_qty, sum(soi.back_order_qty) as total_back_order_qty, sum(soi.packing_order_qty) as total_packing_order_qty,
-		sum(soi.invoice_order_qty) as total_invoice_order_qty, sum(soi.total) as total_amount`).
+		sum(soi.invoice_order_qty) as total_invoice_qty, sum(soi.total) as total_amount`).
 		Joins("left join sales_orders so on so.id = soi.sales_order_id").
 		Where("(so.order_date between ? and ? ) and so.tenant = ?", startDate, endDate, tenant).Find(&data).Error; err != nil {
 		d.Logs.WithContext(ctx).WithError(err).Error("Error getting existing data")

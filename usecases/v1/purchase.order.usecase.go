@@ -160,8 +160,8 @@ func (u *usecase) GetPurchaseOrderRecomendation(ctx context.Context, tenant stri
 				product.Demands.N8Qty +
 				product.Demands.N9Qty +
 				product.Demands.N10Qty +
-				product.Demands.N11Qty +
-				product.Demands.N12Qty
+				product.Demands.N11Qty 
+				// product.Demands.N12Qty
 			
 			if totalDemand12Months == 0 {
 				// Jika tidak ada demand, lewati (tidak perlu dibeli)

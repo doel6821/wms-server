@@ -100,12 +100,12 @@ func (d *postgreDatabase) GetAccountReceivableTotal(ctx context.Context, tenant 
 	if req.ReferenceNumber != "" {
 		query = query.Where("reference_number = ?", req.ReferenceNumber)
 	}
-
+	
 	if req.StartDate != "" && req.EndDate != "" {
 		query = query.Where("payment_date between ? and ?", req.StartDate + " 00:00:00" , req.EndDate + " 23:59:59")
 	}
 
-	err := query.Raw("select sum(ap.amount ) as total from account_receivable ap").Scan(&total).Error
+	err := query.Table("account_receivable ap").Select("sum(ap.amount ) as total").Scan(&total).Error
 
 	if err != nil {
 		d.Logs.WithContext(ctx).WithError(err).Error("Error get AccountReceivable Total")
@@ -123,12 +123,12 @@ func (d *postgreDatabase) GetAccountPayableTotal(ctx context.Context, tenant str
 	if req.ReferenceNumber != "" {
 		query = query.Where("reference_number = ?", req.ReferenceNumber)
 	}
-
+	
 	if req.StartDate != "" && req.EndDate != "" {
 		query = query.Where("payment_date between ? and ?", req.StartDate , req.EndDate )
 	}
 
-	err := query.Raw("select sum(ap.amount ) as total from account_payable ap").Scan(&total).Error
+	err := query.Table("account_payable ap").Select("sum(ap.amount ) as total").Scan(&total).Error
 
 	if err != nil {
 		d.Logs.WithContext(ctx).WithError(err).Error("Error get AccountPayableTotal")

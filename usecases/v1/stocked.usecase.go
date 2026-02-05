@@ -88,8 +88,8 @@ func (u *usecase) CreateStocked(ctx context.Context, tenant string, req cModels.
 			return res
 		}
 
-		//purchaseOrderItem.ReceiveOrderQty -= v.ReceiveOrderQty
 		purchaseOrderItem.StockedOrderQty += v.ReceiveOrderQty
+		purchaseOrderItem.ReceiveOrderQty -= v.ReceiveOrderQty
 		purchaseOrderItems = append(purchaseOrderItems, purchaseOrderItem)
 	}
 

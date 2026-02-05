@@ -8,7 +8,7 @@ services:
         ANDROMEDA_USERNAME: 
         ANDROMEDA_TOKEN:
         SERVICE_NAME:
-    image: docker-regis.ottodigital.id/dev/-/wms-server:latest
+    image: wms-server:latest
     container_name: CODE_wms-server
     ports:
       - "7878:7878"
